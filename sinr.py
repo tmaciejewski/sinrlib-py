@@ -1,13 +1,11 @@
 #!/usr/bin/python
 
-import sinr_config
-import sinr_model
-
+import sinrlib.model, sinrlib.config
 import scipy
 
-config = sinr_config.SINRConfig()
-model  = sinr_model.SINRModel(config)
+config = sinrlib.config.Config()
+model  = sinrlib.model.Model(config)
 
-links = [(scipy.array([0,0]), scipy.array([4,0]))]
+links = [sinrlib.model.Link((0,0), (4,0))]
 
 print model.eval(links)

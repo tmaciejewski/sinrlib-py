@@ -1,4 +1,4 @@
-class SINRConfig:
+class Config:
     # transmission power
     power = 1.0
 

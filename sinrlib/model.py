@@ -1,6 +1,14 @@
 import scipy.linalg
 
-class SINRModel:
+class Link:
+    def __init__(self, s, r):
+        self.s = scipy.array(s)
+        self.r = scipy.array(r)
+        
+    def __iter__(self):
+        return iter((self.s, self.r))
+
+class Model:
     def __init__(self, config):
         self.config = config
 
@@ -14,23 +22,14 @@ class SINRModel:
             S = self.config.power / dist ** self.config.alpha
             interference += S
         
-        print 'interference:', interference
-
         for (s, r) in links:
             dist = scipy.linalg.norm(s - r)
             S = self.config.power / dist ** self.config.alpha
             local_interference = interference - S
             IN = local_interference + self.config.noise()
-            
-            print 'S:', S
-            print 'dist:', dist
-            print 'power:', self.config.power
-            print 'alpha:', self.config.alpha
-            print 'IN:', IN
 
             if IN > 0:
                 sinr = S / IN
-                print 'sinr:', sinr
 
                 if sinr >= self.config.beta:
                     success.append((s, r))
