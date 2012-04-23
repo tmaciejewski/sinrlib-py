@@ -1,11 +1,22 @@
 #!/usr/bin/python
 
-import sinrlib.model, sinrlib.config
+import sinrlib.simulation, sinrlib.config
+from sinrlib.noise.gev import GEV
 import scipy
 
+def echo(uid, msg, sender, links):
+    return sender
+
 config = sinrlib.config.Config()
-model  = sinrlib.model.Model(config)
+config.noise = GEV(-90, 1.5)
+config.power = -100
+config.beta = 1.1
 
-links = [sinrlib.model.Link((0,0), (4,0))]
+model = sinrlib.model.Model(config)
+model.nodes = [sinrlib.model.Node(0, 0), sinrlib.model.Node(1,0)]
 
-print model.eval(links)
+simulation = sinrlib.simulation.Simulation(model)
+
+links = [(0, 1)]
+
+simulation.run(10, echo, links)
