@@ -40,7 +40,7 @@ class Model:
             local_interference = interference - S
             IN = local_interference + self.config.noise()
 
-            if IN > 0:
+            if IN != 0:
                 sinr = S / IN
 
                 if sinr >= self.config.beta:
