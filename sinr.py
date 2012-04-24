@@ -8,7 +8,7 @@ def echo(uid, msg, sender, links):
     return sender
 
 config = sinrlib.config.Config()
-config.noise = GEV(-90, 1.5)
+config.noise = GEV(-90, 1.5, 0.25)
 config.power = -100
 config.beta = 1.1
 
