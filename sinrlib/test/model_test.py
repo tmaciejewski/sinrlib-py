@@ -12,13 +12,12 @@ class ModelGEVTest(unittest.TestCase):
         self.config = config.Config()
         self.config.power = -100
         self.config.noise = noise.gev.GEV(-90, 1.5)
-        self.model  = model.Model(self.config)
-        self.n0 = model.Node(0, 0)
-        self.n1 = model.Node(100, 0)
-        self.n2 = model.Node(0, 0.1)
-        self.n3 = model.Node(100, 0.1)
-        self.n4 = model.Node(4, 0)
-        self.model.nodes = [self.n0, self.n1, self.n2, self.n3, self.n4]
+        self.model = model.Model(self.config)
+        self.model.add_node(0, 0)
+        self.model.add_node(1, 0)
+        self.model.add_node(0, 0.1)
+        self.model.add_node(1, 0.1)
+        self.model.add_node(4, 0)
             
     def test_eval(self):
         l1 = (0, 1)
@@ -33,13 +32,12 @@ class ModelGEVTest(unittest.TestCase):
 class ModelTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
-        self.model  = model.Model(self.config)
-        self.n0 = model.Node(0, 0)
-        self.n1 = model.Node(1, 0)
-        self.n2 = model.Node(0, 0.1)
-        self.n3 = model.Node(1, 0.1)
-        self.n4 = model.Node(4, 0)
-        self.model.nodes = [self.n0, self.n1, self.n2, self.n3, self.n4]
+        self.model = model.Model(self.config)
+        self.model.add_node(0, 0)
+        self.model.add_node(1, 0)
+        self.model.add_node(0, 0.1)
+        self.model.add_node(1, 0.1)
+        self.model.add_node(4, 0)
 
     def test_generate(self):
         m = model.Model(self.config)

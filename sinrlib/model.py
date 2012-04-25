@@ -10,6 +10,11 @@ class Model:
         self.config = config
         self.nodes = []
         self.links = {}
+
+    def add_node(self, x, y, links = []):
+        n = Node(x, y)
+        self.nodes.append(n)
+        self.links[n] = links
     
     def generate(self, n):
         self.nodes = [Node(0, 0)]
