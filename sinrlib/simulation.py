@@ -20,7 +20,7 @@ class Simulation:
 
             for s, r in sent:
                 try:
-                    new_s = algorithm(r, True, s, [])
+                    new_s = algorithm(r, True, s, self.model.links[r])
                     if new_s != None:
                         new_links.append((r, new_s))
                 except Exception as e:
