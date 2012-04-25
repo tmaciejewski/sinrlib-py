@@ -1,18 +1,28 @@
 import model
 
+class Algorithm:
+    def init(self, uid, links):
+        return []
+
+    def compute(self, uid, message, sender, links):
+        return []
+
 class Simulation:
     def __init__(self, _model):
         self.model = _model
 
-    def run(self, rounds, algorithm, initial_state):
-        links = initial_state
+    def run(self, rounds, algorithm):
+        messages = []
+        for node in self.model.nodes.keys():
+            for receiver in algorithm.init(node, self.model.links[node]):
+                messages.append((node, receiver))
 
         print 'Starting', rounds, 'rounds with initial state:', \
-            initial_state
+            messages
 
         for i in range(rounds):
-            sent, failed = self.model.eval(links)
-            new_links = []
+            sent, failed = self.model.eval(messages)
+            new_messages = []
 
             print 'round:', i
             print 'sent:', sent
@@ -20,11 +30,11 @@ class Simulation:
 
             for s, r in sent:
                 try:
-                    new_s = algorithm(r, True, s, self.model.links[r])
-                    if new_s != None:
-                        new_links.append((r, new_s))
+                    for receiver in algorithm.compute(r, True, s, self.model.links[r]):
+                        new_messages.append((r, receiver))
+
                 except Exception as e:
                     print 'The algorithm for', r, 'raised an exception:', e.message
 
-            links = new_links
+            messages = new_messages
 
