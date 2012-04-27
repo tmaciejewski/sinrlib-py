@@ -2,6 +2,7 @@ import math, random
 
 class GEV:
     def __init__(self, mi, sigma, ksi = 0):
+        self.rng = random.Random(0)
         self.mi = mi
         self.sigma = sigma
         self.ksi = ksi
@@ -9,7 +10,7 @@ class GEV:
     def __call__(self):
         x = 0
         while x == 0:
-            x = random.random()
+            x = self.rng.random()
 
         if self.ksi == 0:
             return self.mi - self.sigma * math.log(-math.log(x))
