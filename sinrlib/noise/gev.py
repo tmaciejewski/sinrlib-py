@@ -2,10 +2,14 @@ import math, random
 
 class GEV:
     def __init__(self, mi, sigma, ksi = 0):
-        self.rng = random.Random(0)
+        self.rng = random.Random()
+        self.init_state = self.rng.getstate()
         self.mi = mi
         self.sigma = sigma
         self.ksi = ksi
+
+    def reset(self):
+        self.rng.setstate(self.init_state)
 
     def __call__(self):
         x = 0
