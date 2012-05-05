@@ -1,5 +1,6 @@
 import scipy, scipy.linalg
 import random
+import matplotlib.pyplot
 
 class Node:
     def __init__(self, x, y):
@@ -61,3 +62,17 @@ class Model:
                 success.append((s, r))
                 
         return success, failed
+        
+    def show(self):
+        xs = [v.pos[0] for v in self.nodes.values()]
+        ys = [v.pos[1] for v in self.nodes.values()]
+
+        matplotlib.pyplot.plot(xs, ys, 'o')
+
+        for s in self.links:
+            for r in self.links[s]:
+                xs = [self.nodes[s].pos[0], self.nodes[r].pos[0]]
+                ys = [self.nodes[s].pos[1], self.nodes[r].pos[1]]
+                matplotlib.pyplot.plot(xs, ys, 'b')
+
+        matplotlib.pyplot.show()
