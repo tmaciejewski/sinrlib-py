@@ -5,13 +5,13 @@ import sys
 sys.path.append('..')
 
 import unittest
-import model, config
+import models.gauss, config
 
 class ModelTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
-        self.model = model.Model(self.config)
-        self.model.generate(40)
+        self.model = models.gauss.GaussModel(self.config)
+        self.model.generate(50, .5)
 
     def test_show(self):
         self.model.show()            
