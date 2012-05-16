@@ -9,4 +9,4 @@ class Config:
     beta = 1.0
 
     # background noise model
-    noise = lambda _ : 0.1
+    noise = lambda _ : 1.0
