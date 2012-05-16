@@ -1,10 +1,14 @@
 import math
 import matplotlib.pyplot
+import pickle
 
 class Node:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
         
     def __sub__(self, other):
         dx = other.x - self.x
@@ -59,3 +63,15 @@ class Model:
                 matplotlib.pyplot.plot(xs, ys, 'b')
 
         matplotlib.pyplot.show()
+
+    def save(self, filename):
+        f = open(filename, 'wb')
+        pickle.dump(self.nodes, f)
+        pickle.dump(self.links, f)
+        f.close()
+
+    def load(self, filename):
+        f = open(filename, 'rb')
+        self.nodes = pickle.load(f)
+        self.links = pickle.load(f)
+
