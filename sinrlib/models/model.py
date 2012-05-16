@@ -50,7 +50,7 @@ class Model:
         xs = [v.x for v in self.nodes.values()]
         ys = [v.y for v in self.nodes.values()]
 
-        matplotlib.pyplot.plot(xs, ys, 'o')
+        matplotlib.pyplot.plot(xs, ys, 'or')
 
         for s in self.links:
             for r in self.links[s]:
