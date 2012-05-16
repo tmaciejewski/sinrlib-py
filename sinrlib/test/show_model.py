@@ -11,7 +11,7 @@ class ModelTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
         self.model = models.gauss.GaussModel(self.config)
-        self.model.generate(50, .5)
+        self.model.generate(50, .85)
 
     def test_show(self):
         self.model.show()            
