@@ -49,19 +49,30 @@ class Model:
                 success.append((s, r))
                 
         return success, failed
+
+    def is_connected(self):
+        visited_nodes = set()
+        queue = [self.nodes.keys()[0]]
+        
+        while len(queue) > 0:
+            uid = queue.pop()
+            visited_nodes.add(uid)
+            for neighbor in self.links[uid]:
+                if not neighbor in visited_nodes:
+                    queue.append(neighbor)
+
+        return len(visited_nodes) == len(self.nodes)
         
     def show(self):
-        xs = [v.x for v in self.nodes.values()]
-        ys = [v.y for v in self.nodes.values()]
-
-        matplotlib.pyplot.plot(xs, ys, 'or')
-
         for s in self.links:
             for r in self.links[s]:
                 xs = [self.nodes[s].x, self.nodes[r].x]
                 ys = [self.nodes[s].y, self.nodes[r].y]
                 matplotlib.pyplot.plot(xs, ys, 'b')
 
+        xs = [v.x for v in self.nodes.values()]
+        ys = [v.y for v in self.nodes.values()]
+        matplotlib.pyplot.plot(xs, ys, 'or', markersize = 8)
         matplotlib.pyplot.show()
 
     def save(self, filename):
