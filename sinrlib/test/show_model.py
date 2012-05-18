@@ -4,14 +4,18 @@ import sys
 
 sys.path.append('..')
 
-import unittest
-import models.gauss, config
+import unittest, config, models
+from models.gauss import GaussModel
+from models.uniform import UniformModel
 
 class ModelTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
-        self.model = models.gauss.GaussModel(self.config)
-        self.model.generate(50, .85)
+        #self.model = GaussModel(self.config)
+        #self.model.generate(50, .85)
+
+        self.model = UniformModel(self.config)
+        self.model.generate(100, 8)
 
     def test_show(self):
         self.model.show()            
