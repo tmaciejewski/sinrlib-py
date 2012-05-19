@@ -14,6 +14,9 @@ class Node:
         dx = other.x - self.x
         dy = other.y - self.y
         return math.sqrt(dx**2 + dy**2)
+
+    def __str__(self):
+        return 'Node(%s, %s)' % (self.x, self.y)
         
 
 class Model:
