@@ -15,7 +15,7 @@ class ModelTest(unittest.TestCase):
         #self.model.generate(50, .85)
 
         self.model = UniformModel(self.config)
-        self.model.generate(100, 8)
+        self.model.generate(200, 10)
 
     def test_show(self):
         self.model.show()            

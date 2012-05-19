@@ -21,9 +21,8 @@ class GaussModel(model.Model):
 
             for uid1, node1 in self.nodes.iteritems():
                 for uid2, node2 in self.nodes.iteritems():
-                    if uid1 != uid2 and node1 - node2 <= 1:
+                    if uid1 != uid2 and node1 - node2 <= self.config.range:
                         self.links[uid1].append(uid2)
-                        self.links[uid2].append(uid1)
 
             
             if self.is_connected():

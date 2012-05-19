@@ -10,3 +10,5 @@ class Config:
 
     # background noise model
     noise = lambda _ : 1.0
+    
+    range = 1.0
