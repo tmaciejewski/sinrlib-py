@@ -69,9 +69,10 @@ class Model:
     def show(self):
         for s in self.links:
             for r in self.links[s]:
-                xs = [self.nodes[s].x, self.nodes[r].x]
-                ys = [self.nodes[s].y, self.nodes[r].y]
-                matplotlib.pyplot.plot(xs, ys, 'b')
+                if s < r:
+                    xs = [self.nodes[s].x, self.nodes[r].x]
+                    ys = [self.nodes[s].y, self.nodes[r].y]
+                    matplotlib.pyplot.plot(xs, ys, 'b')
 
         xs = [v.x for v in self.nodes.values()]
         ys = [v.y for v in self.nodes.values()]
