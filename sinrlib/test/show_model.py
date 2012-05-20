@@ -7,15 +7,20 @@ sys.path.append('..')
 import unittest, config, models
 from models.gauss import GaussModel
 from models.uniform import UniformModel
+from models.social import SocialModel
 
 class ModelTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
+        
         #self.model = GaussModel(self.config)
         #self.model.generate(50, .85)
 
-        self.model = UniformModel(self.config)
-        self.model.generate(200, 10)
+        #self.model = UniformModel(self.config)
+        #self.model.generate(200, 8)
+
+        self.model = SocialModel(self.config)
+        self.model.generate(50, 5, 1, 0.2)
 
     def test_show(self):
         self.model.show()            
