@@ -66,7 +66,12 @@ class Model:
 
         return len(visited_nodes) == len(self.nodes)
         
-    def show(self):
+    def show(self, title):
+        self.plot(title)
+        matplotlib.pyplot.show()
+
+    def plot(self, title):
+        matplotlib.pyplot.cla()
         for s in self.links:
             for r in self.links[s]:
                 if s < r:
@@ -76,8 +81,12 @@ class Model:
 
         xs = [v.x for v in self.nodes.values()]
         ys = [v.y for v in self.nodes.values()]
+        matplotlib.pyplot.title(title)
         matplotlib.pyplot.plot(xs, ys, 'or', markersize = 8)
-        matplotlib.pyplot.show()
+
+    def export_to_pdf(self, filename, title):
+        self.plot(title)
+        matplotlib.pyplot.savefig(filename)
 
     def save(self, filename):
         f = open(filename, 'wb')
@@ -89,4 +98,3 @@ class Model:
         f = open(filename, 'rb')
         self.nodes = pickle.load(f)
         self.links = pickle.load(f)
-
