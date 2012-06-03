@@ -1,33 +1,38 @@
 #!/usr/bin/python
 
-import sys
+import sys, random
 
 sys.path.append('..')
 
-import unittest, config, models
+from config import Config
 from models.gauss import GaussModel
 from models.uniform import UniformModel
 from models.social import SocialModel
 from models.gadget import GadgetModel
 
-class ModelTest(unittest.TestCase):
-    def setUp(self):
-        self.config = config.Config()
-        
-        #self.model = GaussModel(self.config)
-        #self.model.generate(50, .85)
+config = Config()
+config.range = 1
 
-        #self.model = UniformModel(self.config)
-        #self.model.generate(200, 8)
+#model = GaussModel(config)
+#model.generate(50, .85)
 
-        #self.model = SocialModel(self.config)
-        #self.model.generate(50, 5, 1, 0.2)
+#model = UniformModel(config)
+#model.generate(200, 8)
 
-        self.model = GadgetModel(self.config)
-        self.model.generate(4, 5, 0.1)
+#model = SocialModel(config)
+#model.generate(10, 3, 1, 0.2)
 
-    def test_show(self):
-        self.model.show()            
- 
-if __name__ == "__main__":
-    unittest.main()
+model = GadgetModel(config)
+model.generate(5, 15, 0.1)
+
+#for i in range(100):
+#    n = random.randint(30,200)
+#    s = 5
+#    title = 'Uniform %d, n = %d, s = %d' % (i, n, s)
+#    try:
+#        model.generate(n, s)
+#        model.export_to_pdf('uniform%d.png' % i, title)
+#    except:
+#        pass                
+
+model.show('Network')            

@@ -53,18 +53,25 @@ class Model:
                 
         return success, failed
 
-    def is_connected(self):
-        visited_nodes = set()
-        queue = [self.nodes.keys()[0]]
-        
-        while len(queue) > 0:
-            uid = queue.pop()
-            visited_nodes.add(uid)
-            for neighbor in self.links[uid]:
-                if not neighbor in visited_nodes:
-                    queue.append(neighbor)
+    def connected_components(self):
+        components = []
+        nodes = set(self.nodes.keys())
 
-        return len(visited_nodes) == len(self.nodes)
+        while len(nodes) > 0:
+            visited_nodes = set()
+            queue = [nodes.pop()]
+            
+            while len(queue) > 0:
+                uid = queue.pop()
+                visited_nodes.add(uid)
+                for neighbor in self.links[uid]:
+                    if not neighbor in visited_nodes:
+                        queue.append(neighbor)
+
+            components.append(visited_nodes)
+            nodes -= visited_nodes
+
+        return components
         
     def show(self, title):
         self.plot(title)

@@ -18,7 +18,7 @@ class UniformModel(model.Model):
                     if uid1 != uid2 and node1 - node2 <= self.config.range:
                         self.links[uid1].append(uid2)
             
-            if self.is_connected():
+            if len(self.connected_components()) == 1:
                 return
         
         raise Exception("Can't generate a connected graph")
