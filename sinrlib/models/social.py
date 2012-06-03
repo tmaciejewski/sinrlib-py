@@ -7,28 +7,27 @@ class SocialModel(model.Model):
 
         return x, y
 
-    def eval_weights(self, e, tiles):
-        sec_links = []
+    def update_weights(self, s, e, uid):
+        tiles = int(s / e) 
+        node = self.nodes[uid]
+        i = tiles - 1 - int(node.y / e)
+        j = int(node.x / e)
+        tile = i * tiles + j
 
-        for _ in range(tiles):
-            for _ in range(tiles):
-                sec_links.append(set())
+        for uid1 in self.links[uid]:
+            for uid2 in self.links[uid1]:
+                if uid != uid2:
+                    node2 = self.nodes[uid2]
+                    i = tiles - 1 - int(node2.y / e)
+                    j = int(node2.x / e)
+                    tile2 = i * tiles + j
 
-        for uid, node in self.nodes.iteritems():
-            i = tiles - 1 - int(node.y / e)
-            j = int(node.x / e)
-            tile = i * tiles + j
-            for neighbor in self.links[uid]:
-                for neighbor2 in self.links[neighbor]:
-                    if uid != neighbor2:
-                        sec_links[tile].add(neighbor2)
-
-        return [len(links) for links in sec_links]
+                    self.sec_links[tile].add(uid2)
+                    self.sec_links[tile2].add(uid)
 
     def social_sel(self, s, e):
         tiles = int(s / e) 
-
-        weights = self.eval_weights(e, tiles)
+        weights = [ len(links) for links in self.sec_links ]
 
         #print 'Weights: '
         #for i in range(tiles):
@@ -40,13 +39,9 @@ class SocialModel(model.Model):
         i = tile / tiles
         j = tile % tiles
 
-        #print 'Selected tile: %d (%d, %d)' % (tile, i, j)
-
         e_x, e_y = self.uniform_sel(e)
         x = j * e + e_x
         y = (tiles - i - 1) * e + e_y
-
-        #print 'Returned: ', x, y
 
         return x, y
         
@@ -68,31 +63,51 @@ class SocialModel(model.Model):
         return i
 
     def generate(self, n, s, e, gamma):
-        for _ in range(100):
-            self.nodes = {}
-            self.links = {}
+        self.nodes = {}
+        self.links = {}
+        uid = 0
+        tiles = int(s / e) 
 
-            for uid in range(n):
-                if random.random() < gamma:
-                    # uniform
-                    #print 'Uniform selection'
-                    x, y = self.uniform_sel(s)
-                else:
-                    # social
-                    #print 'Social selection'
-                    x, y = self.social_sel(s, e)
-                    
-                node = model.Node(x, y)
-                self.links[uid] = []
+        self.sec_links = []
+        for _ in range(tiles):
+            for _ in range(tiles):
+                self.sec_links.append(set())
 
-                for uid2, node2 in self.nodes.iteritems():
-                    if node - node2 <= self.config.range:
-                        self.links[uid].append(uid2)
-                        self.links[uid2].append(uid)
+        while True:
+            if random.random() < gamma:
+                # uniform
+                #print 'Uniform selection'
+                x, y = self.uniform_sel(s)
+            else:
+                # social
+                #print 'Social selection'
+                x, y = self.social_sel(s, e)
+                
+            node = model.Node(x, y)
+            self.links[uid] = []
 
-                self.nodes[uid] = node
+            for uid2, node2 in self.nodes.iteritems():
+                if node - node2 <= self.config.range:
+                    self.links[uid].append(uid2)
+                    self.links[uid2].append(uid)
 
-            #if self.is_connected():
-            return
-        
-        raise Exception("Can't generate a connected graph")
+            self.nodes[uid] = node
+
+            self.update_weights(s, e, uid)
+
+            uid += 1
+
+            components = self.connected_components()
+            for comp in components:
+                if len(comp) == n:
+                    nodes = {}
+                    links = {}
+                    for uid in comp:
+                        nodes[uid] = self.nodes[uid]
+                        links[uid] = []
+                        for uid2 in self.links[uid]:
+                            if uid2 in comp:
+                                links[uid].append(uid2)
+                    self.nodes = nodes
+                    self.links = links
+                    return
