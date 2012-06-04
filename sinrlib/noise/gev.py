@@ -11,6 +11,10 @@ class GEV:
     def reset(self):
         self.rng.setstate(self.init_state)
 
+    def range(self, config):
+        tmp = self.mi + (self.sigma * ((-math.log(.95))**(-self.ksi)) - 1) / self.ksi
+        return (tmp * config.beta / config.power) ** (- 1.0 / config.alpha)
+
     def __call__(self):
         x = 0
         while x == 0:
