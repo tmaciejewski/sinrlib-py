@@ -7,8 +7,3 @@ class Config:
 
     # SINR threshold
     beta = 1.0
-
-    # background noise model
-    noise = lambda _ : 1.0
-    
-    range = 1.0

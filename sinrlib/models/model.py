@@ -3,9 +3,10 @@ import matplotlib.pyplot
 import pickle
 
 class Node:
-    def __init__(self, x, y):
+    def __init__(self, x, y, noise):
         self.x = x
         self.y = y
+        self.noise = noise
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
@@ -37,9 +38,10 @@ class Model:
         
         for (s, r) in links:
             dist = self.nodes[s] - self.nodes[r]
+            noise = self.nodes[r].noise()
             S = self.config.power / dist ** self.config.alpha
             local_interference = interference - S
-            IN = local_interference + self.config.noise()
+            IN = local_interference + noise
 
             if IN != 0:
                 sinr = S / IN

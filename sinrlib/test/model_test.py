@@ -5,21 +5,21 @@ import sys
 sys.path.append('..')
 
 import unittest
-import config, noise.gev
+import config, noise.gev, noise.const
 from models import model
 
 class ModelGEVTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
         self.config.power = -100
-        self.config.noise = noise.gev.GEV(-90, 1.5)
         self.model = model.Model(self.config)
+
         self.nodes = {
-                0 : model.Node(0, 0),
-                1 : model.Node(1, 0),
-                2 : model.Node(0, 0.1),
-                3 : model.Node(1, 0.1),
-                4 : model.Node(4, 0)
+                0 : model.Node(0, 0, noise.gev.GEV(-90, 1.5)),
+                1 : model.Node(1, 0, noise.gev.GEV(-90, 1.5)),
+                2 : model.Node(0, 0.1, noise.gev.GEV(-90, 1.5)),
+                3 : model.Node(1, 0.1, noise.gev.GEV(-90, 1.5)),
+                4 : model.Node(4, 0, noise.gev.GEV(-90, 1.5)),
                 }
 
         self.links = {
@@ -48,11 +48,11 @@ class ModelTest(unittest.TestCase):
         self.config = config.Config()
         self.model = model.Model(self.config)
         self.nodes = {
-                0 : model.Node(0, 0),
-                1 : model.Node(1, 0),
-                2 : model.Node(0, 0.1),
-                3 : model.Node(1, 0.1),
-                4 : model.Node(4, 0)
+                0 : model.Node(0, 0, noise.const.ConstNoise(1)),
+                1 : model.Node(1, 0, noise.const.ConstNoise(1)),
+                2 : model.Node(0, 0.1, noise.const.ConstNoise(1)),
+                3 : model.Node(1, 0.1, noise.const.ConstNoise(1)),
+                4 : model.Node(4, 0, noise.const.ConstNoise(1))
                 }
 
         self.links = {
