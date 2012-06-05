@@ -8,42 +8,7 @@ import unittest
 import config, noise.gev, noise.const
 from models import model
 
-class ModelGEVTest(unittest.TestCase):
-    def setUp(self):
-        self.config = config.Config()
-        self.config.power = -100
-        self.model = model.Model(self.config)
-
-        self.nodes = {
-                0 : model.Node(0, 0, noise.gev.GEV(-90, 1.5)),
-                1 : model.Node(1, 0, noise.gev.GEV(-90, 1.5)),
-                2 : model.Node(0, 0.1, noise.gev.GEV(-90, 1.5)),
-                3 : model.Node(1, 0.1, noise.gev.GEV(-90, 1.5)),
-                4 : model.Node(4, 0, noise.gev.GEV(-90, 1.5)),
-                }
-
-        self.links = {
-                0 : [1, 4],
-                1 : [0],
-                2 : [3],
-                3 : [2],
-                4 : [0]
-                }
-
-        self.model.nodes = self.nodes
-        self.model.links = self.links
-            
-    def test_eval(self):
-        l1 = (0, 1)
-        l2 = (2, 3)
-        l3 = (0, 4)
-        [l1], [] = self.model.eval([l1])
-        [l2], [] = self.model.eval([l2])
-        [], [l1, l2] = self.model.eval([l1, l2])
-        [], [l3] = self.model.eval([l3]) 
-
-
-class ModelTest(unittest.TestCase):
+class EvalTest(unittest.TestCase):
     def setUp(self):
         self.config = config.Config()
         self.model = model.Model(self.config)
@@ -67,13 +32,9 @@ class ModelTest(unittest.TestCase):
         self.model.links = self.links
             
     def test_eval(self):
-        l1 = (0, 1)
-        l2 = (2, 3)
-        l3 = (0, 4)
-        [l1], [] = self.model.eval([l1])
-        [l2], [] = self.model.eval([l2])
-        [], [l1, l2] = self.model.eval([l1, l2])
-        [], [l3] = self.model.eval([l3]) 
+        self.assertEqual(set([1]), self.model.eval([0]))
+        self.assertEqual(set([3]), self.model.eval([2]))
+        self.assertEqual(set(), self.model.eval([0, 2]))
 
     def test_save_load(self):
         self.model.save('model.tmp')

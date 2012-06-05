@@ -26,34 +26,25 @@ class Model:
         self.nodes = {}
         self.links = {}
 
-    def eval(self, links):
-        interference = 0
-        success = []
-        failed = []
+    def power(self, sender, receiver):
+        dist = self.nodes[sender] - self.nodes[receiver]
+        return self.config.power / dist ** self.config.alpha
 
-        for (s, r) in links:
-            dist = self.nodes[s] - self.nodes[r]
-            S = self.config.power / dist ** self.config.alpha
-            interference += S
-        
-        for (s, r) in links:
-            dist = self.nodes[s] - self.nodes[r]
-            noise = self.nodes[r].noise()
-            S = self.config.power / dist ** self.config.alpha
-            local_interference = interference - S
-            IN = local_interference + noise
-
-            if IN != 0:
-                sinr = S / IN
-
-                if sinr >= self.config.beta:
-                    success.append((s, r))
-                else:
-                    failed.append((s, r))
-            else:
-                success.append((s, r))
+    def eval(self, senders):
+        success = set()
+        for sender in senders:
+            for receiver in self.links[sender]:
+                interference = sum([self.power(node, receiver) \
+                        for node in senders if node != sender])
+                noise = self.nodes[receiver].noise()
+                try:
+                    SINR = self.power(sender, receiver) / (interference + noise)
+                    if SINR >= self.config.beta:
+                        success.add(receiver)
+                except ZeroDivisionError:
+                    success.add(receiver)
                 
-        return success, failed
+        return success
 
     def connected_components(self):
         components = []
