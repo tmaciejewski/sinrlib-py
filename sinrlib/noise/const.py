@@ -10,3 +10,6 @@ class ConstNoise:
 
     def __call__(self):
         return self.n
+
+    def next(self):
+        pass
