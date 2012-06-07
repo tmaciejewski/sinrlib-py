@@ -1,51 +1,41 @@
-import model
-
 class Algorithm:
-    def init(self, uid, links):
-        return []
+    def init(self, nodes, links):
+        return set()
 
-    def compute(self, uid, message, sender, links):
-        return []
+    def on_received(self, uid, message, sender):
+        return
+
+    def new_round(self, round_number):
+        return
+
+    def is_done(self):
+        return True
+
+class Message:
+    pass
 
 class NotLinked(Exception):
     pass
 
 class Simulation:
-    def __init__(self, _model):
-        self.model = _model
+    def __init__(self, model):
+        self.model = model
 
-    def run(self, rounds, algorithm):
-        messages = []
-        for node in self.model.nodes.keys():
-            for receiver in algorithm.init(node, self.model.links[node]):
-                if receiver in self.model.links[node]:
-                    messages.append((node, receiver))
-                else:
-                    raise NotLinked("Node %d is not linked with %d" % (node, receiver))
+    def run(self, algorithm):
+        senders = algorithm.init(self.model.nodes, self.model.links)
+        round = 0
 
-        print 'Starting', rounds, 'rounds with initial state:', messages
+        while not algorithm.is_done():
+            receivers = self.model.eval(senders)
+            for uid in receivers:
+                if not algorithm.on_received(uid, Message(), None):
+                    receivers.remove(uid)
 
-        for i in range(rounds):
-            sent, failed = self.model.eval(messages)
-            new_messages = []
+            senders = receivers
 
-            print 'round:', i
-            print 'sent:', sent
-            print 'failed:', failed
+            round += 1
 
-            for s, r in sent:
-                try:
-                    for receiver in algorithm.compute(r, True, s, self.model.links[r]):
-                        if receiver in self.model.links[r]:
-                            new_messages.append((r, receiver))
-                        else:
-                            raise NotLinked("Node %d is not linked with %d" % (r, receiver))
+            if round > 10:
+                return -1
 
-                except NotLinked:
-                    raise
-
-                except Exception as e:
-                    print 'The algorithm for', r, 'raised an exception:', e.message
-
-            messages = new_messages
-
+        return round
