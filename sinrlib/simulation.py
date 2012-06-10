@@ -5,7 +5,7 @@ class Algorithm:
     def on_received(self, uid, message, sender):
         return
 
-    def new_round(self, round_number):
+    def on_round_end(self, uid, round_number):
         return
 
     def is_done(self):
@@ -23,19 +23,24 @@ class Simulation:
 
     def run(self, algorithm):
         senders = algorithm.init(self.model.nodes, self.model.links)
-        round = 0
+        round_number = 0
 
         while not algorithm.is_done():
             receivers = self.model.eval(senders)
+            new_senders = set()
             for uid in receivers:
-                if not algorithm.on_received(uid, Message(), None):
-                    receivers.remove(uid)
+                if algorithm.on_received(uid, Message(), None):
+                    new_senders.add(uid)
 
-            senders = receivers
+            for uid in self.model.nodes:
+                if algorithm.on_round_end(uid, round_number):
+                    new_senders.add(uid)
 
-            round += 1
+            senders = new_senders
 
-            if round > 10:
+            round_number += 1
+
+            if round_number > 1000:
                 return -1
 
-        return round
+        return round_number

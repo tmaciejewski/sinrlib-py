@@ -1,50 +1,53 @@
 #!/usr/bin/python
 
+import random, math
 import sinrlib.simulation, sinrlib.config
 from sinrlib.noise.gev import GEV
-import scipy
+from sinrlib.noise.const import ConstNoise
+from sinrlib.models.uniform import UniformModel
 
-class Echo(sinrlib.simulation.Algorithm):
-    def init(self, uid, links):
-        if uid == 0:
-            return links
-        else:
-            return []
+class Algorithm1(sinrlib.simulation.Algorithm):
+    def init(self, nodes, links):
+        self.nodes = nodes.keys()
+        self.N = len(nodes)
+        self.active = {}
+        return {self.nodes[0]}
 
-    def compute(self, uid, msg, sender, links):
-        return [sender]
+    def on_received(self, uid, message, sender):
+        try:
+            self.nodes.remove(uid)
+            self.active[uid] = True
+        except ValueError:
+            pass
+        return False
 
-class Broadcast(sinrlib.simulation.Algorithm):
-    def init(self, uid, links):
-        if uid == 0:
-            return links
-        else:
-            return []
+    def on_round_end(self, uid, round_number):
+        try:
+            if self.active[uid]:
+                return random.random() < (2.0 / self.N)
+        except KeyError:
+            pass
 
-    def compute(self, uid, msg, sender, links):
-        return [node for node in links if node != sender]
+        return False
 
-config1 = sinrlib.config.Config()
-config1.noise = GEV(-90, 1.5, 0.25)
-config1.power = -100
-config1.beta = 1.1
+    def is_done(self):
+        return self.nodes == []
 
-model1 = sinrlib.model.Model(config1)
-model1.add_node(0, 0, 0)
-model1.add_node(1, 1, 0)
-model1.link_nodes(0, 1)
+def main():
+    config = sinrlib.config.Config()
+    model = UniformModel(config, lambda: ConstNoise(1.0))
+    tries = 1000
+    results = []
 
+    for i in range(tries):
+        model.generate(10, 3)
+        simulation = sinrlib.simulation.Simulation(model)
+        results.append(simulation.run(Algorithm1()))
 
-config2 = sinrlib.config.Config()
-config2.noise = GEV(5, 1.5, 0.25)
-config2.power = 10000
-config2.beta = 0.1
+    avg = float(sum(results)) / tries
 
-model2 = sinrlib.model.Model(config2)
-model2.generate(10) 
+    print 'avg:', avg
+    print 'std:', math.sqrt(sum([(r - avg)**2 for r in results]) / tries)
 
-simulation1 = sinrlib.simulation.Simulation(model1)
-simulation1.run(10, Echo())
-
-simulation2 = sinrlib.simulation.Simulation(model2)
-simulation2.run(10, Broadcast())
+if __name__ == "__main__":
+    main()
