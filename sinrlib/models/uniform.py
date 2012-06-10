@@ -10,7 +10,7 @@ class UniformModel(model.Model):
                 x = random.random() * size
                 y = random.random() * size
 
-                self.nodes[uid] = model.Node(x, y)
+                self.nodes[uid] = model.Node(x, y, self.noise_factory())
                 self.links[uid] = []
 
             for uid1, node1 in self.nodes.iteritems():
@@ -21,4 +21,4 @@ class UniformModel(model.Model):
             if len(self.connected_components()) == 1:
                 return
         
-        raise Exception("Can't generate a connected graph")
+        raise Exception("Can't generate connected graph")

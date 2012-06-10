@@ -21,8 +21,9 @@ class Node:
         
 
 class Model:
-    def __init__(self, config):
+    def __init__(self, config, noise_factory):
         self.config = config
+        self.noise_factory = noise_factory
         self.nodes = {}
         self.links = {}
 
@@ -34,15 +35,17 @@ class Model:
         success = set()
         for sender in senders:
             for receiver in self.links[sender]:
-                interference = sum([self.power(node, receiver) \
-                        for node in senders if node != sender])
-                noise = self.nodes[receiver].noise()
-                try:
-                    SINR = self.power(sender, receiver) / (interference + noise)
-                    if SINR >= self.config.beta:
+                # nodes can't send and receive simultanously
+                if receiver not in senders: 
+                    interference = sum([self.power(node, receiver) \
+                            for node in senders if node != sender])
+                    noise = self.nodes[receiver].noise()
+                    try:
+                        SINR = self.power(sender, receiver) / (interference + noise)
+                        if SINR >= self.config.beta:
+                            success.add(receiver)
+                    except ZeroDivisionError:
                         success.add(receiver)
-                except ZeroDivisionError:
-                    success.add(receiver)
                 
         return success
 
