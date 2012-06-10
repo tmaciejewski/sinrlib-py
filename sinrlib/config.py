@@ -7,3 +7,5 @@ class Config:
 
     # SINR threshold
     beta = 1.0
+
+    range = 1.0
