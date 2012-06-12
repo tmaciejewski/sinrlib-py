@@ -3,7 +3,7 @@ import matplotlib.pyplot
 import pickle
 
 class Node:
-    def __init__(self, x, y, noise):
+    def __init__(self, x, y, noise = None):
         self.x = x
         self.y = y
         self.noise = noise
@@ -21,9 +21,8 @@ class Node:
         
 
 class Model:
-    def __init__(self, config, noise_factory):
+    def __init__(self, config):
         self.config = config
-        self.noise_factory = noise_factory
         self.nodes = {}
         self.links = {}
 

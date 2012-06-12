@@ -62,7 +62,7 @@ class SocialModel(model.Model):
 
         return i
 
-    def generate(self, n, s, e, gamma):
+    def generate(self, n, s, e, range_e, gamma):
         self.nodes = {}
         self.links = {}
         uid = 0
@@ -87,7 +87,7 @@ class SocialModel(model.Model):
             self.links[uid] = []
 
             for uid2, node2 in self.nodes.iteritems():
-                if node - node2 <= self.config.range:
+                if node - node2 <= (1 - range_e) * self.config.range:
                     self.links[uid].append(uid2)
                     self.links[uid2].append(uid)
 
