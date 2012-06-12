@@ -14,30 +14,33 @@ class SimulationTest(unittest.TestCase):
         self.config = config.Config()
         self.model = model.Model(self.config)
         self.nodes = {
-                0 : model.Node(0, 0, const.ConstNoise(1)),
-                1 : model.Node(1, 0, const.ConstNoise(1)),
-                2 : model.Node(2, 0, const.ConstNoise(1)),
+                0 : model.Node(0, 0),
+                1 : model.Node(1, 0),
+                2 : model.Node(2, 0),
                 }
 
         self.links = {
                 0 : [1],
                 1 : [0, 2],
-                3 : [1],
+                2 : [1],
                 }
 
         self.model.nodes = self.nodes
         self.model.links = self.links
 
-        self.simulation = simulation.Simulation(self.model)
+        self.simulation = simulation.Simulation(self.model, lambda: const.ConstNoise(1))
 
         class TestAlgorithm1(simulation.Algorithm):
             def init(self, nodes, links):
                 self.nodes = nodes.keys()
                 return set([0])
 
-            def on_received(self, uid, message, sender):
-                self.nodes.remove(uid)
-                return True
+            def on_round_end(self, uid, message, round_number):
+                if message == True:
+                    self.nodes.remove(uid)
+                    return True
+                else:
+                    return False
 
             def is_done(self):
                 return self.nodes == []
@@ -46,8 +49,8 @@ class SimulationTest(unittest.TestCase):
             def init(self, nodes, links):
                 return set()
 
-            def on_received(self, uid, message, sender):
-                return True
+            def on_round_end(self, uid, message, round_number):
+                return False
 
             def is_done(self):
                 return False
