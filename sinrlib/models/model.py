@@ -68,7 +68,7 @@ class Model:
 
         return components
         
-    def show(self, title):
+    def show(self, title = 'Network'):
         self.plot(title)
         matplotlib.pyplot.show()
 
