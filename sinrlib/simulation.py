@@ -36,8 +36,12 @@ class Simulation:
             if round_number > 1000:
                 return -1
 
+            print 'senders:', senders
+
             # eval model
             receivers = self.model.eval(senders)
+
+            print 'receivers:', receivers
 
             for uid in self.model.nodes:
                 if uid in receivers:

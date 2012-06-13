@@ -3,6 +3,7 @@
 import math
 
 from algorithms.naive import Algorithm1
+from algorithms.density import DensityAlgorithm
 from sinrlib.config import Config
 from sinrlib.simulation import Simulation
 from sinrlib.models.uniform import UniformModel
@@ -11,13 +12,15 @@ from sinrlib.noise.const import ConstNoise
 def main():
     config = Config()
     model = UniformModel(config)
-    tries = 1000
+    tries = 1
     results = []
 
     for i in range(tries):
-        model.generate(10, 3)
+        e = 0.2
+        model.generate(100, 1, 0.8)
+        #model.show()
         simulation = Simulation(model, lambda: ConstNoise(1.0))
-        results.append(simulation.run(Algorithm1()))
+        results.append(simulation.run(DensityAlgorithm(config, e)))
 
     avg = float(sum(results)) / tries
 
