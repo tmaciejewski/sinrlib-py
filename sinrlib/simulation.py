@@ -33,7 +33,7 @@ class Simulation:
             new_senders = set()
             messages = {}
 
-            if round_number > 1000:
+            if round_number > 10000:
                 raise AlgorithmFailed
 
             #print 'senders:', senders

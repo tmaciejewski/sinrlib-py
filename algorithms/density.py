@@ -26,7 +26,7 @@ class DensityAlgorithm():
         self.density = {}
         self.active = set()
         #self.d = self.e**3 / (16 * min(4, 1.0 / (self.alpha - 2), math.log(self.N)))
-        self.d = 1.0 / (16 * min(4, math.log(self.N)))
+        self.d = 1.0 / (16 * min(4, 1.0 / (self.alpha - 2), math.log(self.N)))
         self.eval_density(nodes, self.e)
 
 
@@ -37,15 +37,13 @@ class DensityAlgorithm():
                 self.active.add(uid)
 
         if uid in self.active:
-            if round_number == 0:
-                return True
-            else:
-                return random.random() < self.d / self.density[uid]
+            print 'thr:', self.d / self.density[uid]
+            return random.random() < self.d / self.density[uid]
         else:
             return False
 
     def is_done(self):
-        #print 'progress:',len(self.active), '<', self.N
+        #print 'progress:', len(self.active) / float(self.N)
         return len(self.active) == self.N
 
 if __name__ == "__main__":
