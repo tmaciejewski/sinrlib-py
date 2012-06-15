@@ -25,10 +25,16 @@ class Model:
         self.config = config
         self.nodes = {}
         self.links = {}
+        self.power_cache  = {}
 
     def power(self, sender, receiver):
-        dist = self.nodes[sender] - self.nodes[receiver]
-        return self.config.power / dist ** self.config.alpha
+        if (sender, receiver) in self.power_cache:
+            return self.power_cache[(sender, receiver)]
+        else:
+            dist = self.nodes[sender] - self.nodes[receiver]
+            p = self.config.power / dist ** self.config.alpha
+            self.power_cache[(sender, receiver)] = p
+            return self.power_cache[(sender, receiver)]
 
     def eval(self, senders):
         success = set()
