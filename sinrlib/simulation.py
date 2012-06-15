@@ -11,7 +11,7 @@ class Algorithm:
 class Message:
     pass
 
-class NotLinked(Exception):
+class AlgorithmFailed(Exception):
     pass
 
 class Simulation:
@@ -34,14 +34,14 @@ class Simulation:
             messages = {}
 
             if round_number > 1000:
-                return -1
+                raise AlgorithmFailed
 
-            print 'senders:', senders
+            #print 'senders:', senders
 
             # eval model
             receivers = self.model.eval(senders)
 
-            print 'receivers:', receivers
+            #print 'receivers:', receivers
 
             for uid in self.model.nodes:
                 if uid in receivers:
