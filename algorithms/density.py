@@ -1,9 +1,10 @@
 import random, math
 
 class DensityAlgorithm():
-    def __init__(self, config, e):
+    def __init__(self, config, e, C):
         self.alpha = config.alpha
         self.e = e
+        self.C = C
 
     def eval_density(self, nodes, e):
         density = {}
@@ -25,8 +26,7 @@ class DensityAlgorithm():
         self.N = len(nodes)
         self.density = {}
         self.active = set()
-        #self.d = self.e**3 / (16 * min(4, 1.0 / (self.alpha - 2), math.log(self.N)))
-        self.d = 1.0 / (16 * min(4, 1.0 / (self.alpha - 2), math.log(self.N)))
+        self.d = self.C * self.e**3 * min(4, 1.0 / (self.alpha - 2), math.log(self.N))
         self.eval_density(nodes, self.e)
 
 
@@ -37,7 +37,7 @@ class DensityAlgorithm():
                 self.active.add(uid)
 
         if uid in self.active:
-            print 'thr:', self.d / self.density[uid]
+            #print 'd/D:', self.d,  self.density[uid]
             return random.random() < self.d / self.density[uid]
         else:
             return False
