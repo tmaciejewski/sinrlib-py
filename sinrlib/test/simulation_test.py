@@ -62,7 +62,8 @@ class SimulationTest(unittest.TestCase):
         self.assertEqual(2, self.simulation.run(self.algorithm1))
 
     def test_failed_simulation(self):
-        self.assertEqual(-1, self.simulation.run(self.algorithm2))
+        with self.assertRaises(simulation.AlgorithmFailed):
+            self.simulation.run(self.algorithm2)
 
 if __name__ == "__main__":
     unittest.main()
