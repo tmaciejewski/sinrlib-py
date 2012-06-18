@@ -11,16 +11,22 @@ class UniformModel(model.Model):
             y = random.random() * size
 
             node = model.Node(x, y)
-            self.links[uid] = []
+            self.links[uid] = set([])
 
             for uid2, node2 in self.nodes.iteritems():
                 if node - node2 <= (1 - range_e) * self.config.range:
-                    self.links[uid].append(uid2)
-                    self.links[uid2].append(uid)
+                    self.links[uid].add(uid2)
+                    self.links[uid2].add(uid)
         
             self.nodes[uid] = node
             uid += 1
 
             if len(self.nodes) >= n:
-                if len(self.connected_components()) == 1:
-                    return
+                for comp in self.connected_components():
+                    if len(comp) == n:
+                        nodes = {}
+                        for uid in comp:
+                            nodes[uid] = self.nodes[uid]
+                            self.links[uid].intersection_update(comp)
+                        self.nodes = nodes
+                        return
