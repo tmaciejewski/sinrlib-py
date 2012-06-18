@@ -1,0 +1,7 @@
+* Noise
+ 
+* losowe uid
+
+* Algorytm drugi ("randomizacja deterministycznego")
+- wybor liderow deterministyczny z wykorzystaniem elekcji z granularity
+TJu dosle notatke.

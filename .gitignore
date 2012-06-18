@@ -3,3 +3,7 @@
 *.pyc
 .*.swp
 *.tmp
+*.pdf
+*.aux
+*.log
+*.gz

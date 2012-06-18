@@ -1,0 +1,119 @@
+\documentclass[a4paper,draft,12pt]{report}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\allowdisplaybreaks
+
+\title{Broadcast algorithms in SINR model with random noise}
+
+
+\begin{document}
+
+\maketitle
+
+\chapter{Introduction}
+
+\chapter{Model}
+
+\section{Signal-to-interference ratio}
+
+\begin{equation}
+\label{eq:sinr}
+\frac{\frac{P}{d^\alpha}}{I + R}
+\end{equation}
+
+\section{Random noise}
+
+In the real world the noise value is not constant. It depends on many physical factors like weather or even cosmic noise. Using random N values approximating real noise seems to be a good idea.
+
+Random noise can be modelled quite as a Generalized Extreme Value  \cite{gev} distribution with some parameters $\mu, \sigma, \xi$. We assume $\xi \neq 0$. Cumulative distribution function for GEV($\mu, \sigma, \xi$) distribution is:
+
+\begin{equation}
+\label{eq:gev_cdf}
+\textbf{P}(N \leq x) = e^{-(1 + \xi \frac{x - \mu}{\sigma}) ^ {-\frac{1}{\xi}}}
+\end{equation}
+
+The values of $\xi, \mu$ and $\sigma$ can be found experimentally.
+
+\section{Range}
+
+We define transmission range $r_i$ of a node $i$ as a maximum distance at which the node can succesfully transmit its signal when there is no interference other than background noise. This is easy to obtain from \eqref{eq:sinr}:
+
+\begin{align*}
+\beta &= \frac{\frac{P_i}{r_i^\alpha}}{0 + N} \\
+\beta N &= \frac{P_i}{r_i^\alpha} \\
+r_i^\alpha &= \frac{P_i}{\beta N} \\
+r_i &= \left( \frac{P_i}{\beta N} \right)^{\frac{1}{\alpha}}
+\end{align*}
+
+Considering random noise, transmission range of a node can vary due to current noise. We define probable transmission range $\tilde{r}_i$ as a distance at which we have 0.95 probability of a successful transmission.  We have:
+
+\begin{align*}
+\textbf{P}  \left( \beta \leq \frac{\frac{P_i}{\tilde{r}_i^\alpha}}{0 + N} \right) &= 0.95 \\
+\textbf{P}  \left( N \leq \frac{P_i}{\beta \tilde{r}_i^\alpha} \right) &=  0.95
+\end{align*}
+
+and applying \eqref{eq:gev_cdf} we have:
+
+\begin{align}
+e^{-\left(1 + \xi \frac{\frac{P_i}{\beta \tilde{r}_i^\alpha}  - \mu}{\sigma}\right) ^ {-\frac{1}{\xi}}}& = 0.95 \nonumber \\
+\left(1 + \xi \frac{\frac{P_i}{\beta \tilde{r}_i^\alpha}  - \mu}{\sigma}\right) ^ {-\frac{1}{\xi}} &= (- \ln 0.95) \nonumber \\
+\xi \frac{\frac{P_i}{\beta \tilde{r}_i^\alpha}  - \mu}{\sigma} &= (- \ln 0.95)^{-\xi} - 1\nonumber \\
+\frac{P_i}{\beta \tilde{r}_i^\alpha}  - \mu &= \frac{\sigma (- \ln 0.95)^{-\xi} - 1}{\xi} \nonumber\\
+\frac{1}{\tilde{r}_i^\alpha} &= \frac{\beta}{P_i} \left( \frac{\sigma (- \ln 0.95)^{-\xi} - 1}{\xi} + \mu \right)\nonumber \\
+\tilde{r}_i^\alpha  &= \left[ \frac{\beta}{P_i} \left( \frac{\sigma (- \ln 0.95)^{-\xi} - 1}{\xi} + \mu \right) \right]^{-1}\nonumber \\
+\tilde{r}_i  &= \left[ \frac{\beta}{P_i} \left( \frac{\sigma (- \ln 0.95)^{-\xi} - 1}{\xi} + \mu \right) \right]^{-\frac{1}{\alpha}}
+\end{align}
+
+\chapter{Network graph}
+
+Network graph is a undirected graph $G = (V, E)$, where $V = \{v_1, \ldots, v_n\}$ is a set of nodes (points) and $E \in V^2$ is a set of links between nodes. For each node $v_i$ we define $E(v_i)$ to be a set of $v_i$ neighbors, ie. $E(v_i) = \{ v_j \in V : (v_i, v_j) \in E\}$.
+
+We used three methods for generating network graphs:
+\begin{enumerate}
+\item uniform networks,
+\item social networks,
+\item gadget networks
+\end{enumerate}
+
+\noindent Each generated network is strongly connected.
+
+\section{Uniform networks}
+
+Uniforms networks are random graphs generated using a uniform distribution. Each node has a position in $[0, S] \times [0, S]$ square.
+
+\section{Social networks}
+
+Social networks tries to model human behaviour of connecting into larger group. Nodes are generated within a square $[0, S] \times [0, S]$. The square is divided into subsquares of size $\epsilon$. We define $s_{i,j}$ to be a square in i-th row and j-th column. To a subsquare $s_{i,j}$ we assign a weight:
+
+\begin{equation*}
+w_{i,j} = \left| \bigcup_{v \in s_{i,j}} E(E(v)) \right|
+\end{equation*}
+
+With probability $1 - \gamma$ we choose a subsquare $s$ according to the weights, and put new node with random position (using uniform distribution) within the choosen subsquare. With probablity $\gamma$ we use uniform network algorithm to generate new node.
+
+\section{Gadget networks}
+
+Gadget network is a special class of network designed to be  ``hard" for algorithms.
+
+\chapter{Algorithms}
+
+\begin{thebibliography}{9}
+
+\bibitem{sinrsurvey}
+Olga Goussevskaia , Yvonne-Anne
+Pignolet, Roger Wattenhofer,
+\emph{Efficiency of Wireless Networks:
+Approximation Algorithms
+for the Physical Interference Model},
+2010
+
+\bibitem{gev}
+Xu Su, Rajendra V. Boppana,
+\emph{On the impact of noise on mobile ad hoc networks},
+2007, ACM
+
+\end{thebibliography}
+
+\end{document}
