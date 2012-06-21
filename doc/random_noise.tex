@@ -20,12 +20,12 @@
 
 \begin{equation}
 \label{eq:sinr}
-\frac{\frac{P}{d^\alpha}}{I + R}
+\frac{\frac{P}{d^\alpha}}{I + N}
 \end{equation}
 
 \section{Random noise}
 
-In the real world the noise value is not constant. It depends on many physical factors like weather or even cosmic noise. Using random N values approximating real noise seems to be a good idea.
+In the real world the noise value is not constant. It depends on many physical factors like weather or even cosmic noise. Using random values approximating real noise seems to be a good idea.
 
 Random noise can be modelled quite as a Generalized Extreme Value  \cite{gev} distribution with some parameters $\mu, \sigma, \xi$. We assume $\xi \neq 0$. Cumulative distribution function for GEV($\mu, \sigma, \xi$) distribution is:
 
@@ -68,7 +68,7 @@ e^{-\left(1 + \xi \frac{\frac{P_i}{\beta \tilde{r}_i^\alpha}  - \mu}{\sigma}\rig
 
 \chapter{Network graph}
 
-Network graph is a undirected graph $G = (V, E)$, where $V = \{v_1, \ldots, v_n\}$ is a set of nodes (points) and $E \in V^2$ is a set of links between nodes. For each node $v_i$ we define $E(v_i)$ to be a set of $v_i$ neighbors, ie. $E(v_i) = \{ v_j \in V : (v_i, v_j) \in E\}$.
+Network graph is a undirected graph $G = (V, E)$, where $V = \{v_1, \ldots, v_n\}$ is a set of nodes (points) and $E \in V^2$ is a set of links between nodes. For each node $v_i$ we define $E(v_i)$ to be a set of neighbors of $v_i$, ie. $E(v_i) = \{ v_j \in V : (v_i, v_j) \in E\}$.
 
 We used three methods for generating network graphs:
 \begin{enumerate}
@@ -85,19 +85,34 @@ Uniforms networks are random graphs generated using a uniform distribution. Each
 
 \section{Social networks}
 
-Social networks tries to model human behaviour of connecting into larger group. Nodes are generated within a square $[0, S] \times [0, S]$. The square is divided into subsquares of size $\epsilon$. We define $s_{i,j}$ to be a square in i-th row and j-th column. To a subsquare $s_{i,j}$ we assign a weight:
+Social networks tries to model human behaviour of connecting into larger group. Nodes are generated within a square $[0, S] \times [0, S]$. The square is divided into subsquares of size $\epsilon$. We define $s_{i,j}$ to be a set of nodes in a subsquare in i-th row and j-th column. To a subsquare $s_{i,j}$ we assign a weight:
 
 \begin{equation*}
 w_{i,j} = \left| \bigcup_{v \in s_{i,j}} E(E(v)) \right|
 \end{equation*}
 
-With probability $1 - \gamma$ we choose a subsquare $s$ according to the weights, and put new node with random position (using uniform distribution) within the choosen subsquare. With probablity $\gamma$ we use uniform network algorithm to generate new node.
+With probability $1 - \gamma$ we choose a subsquare $s$ according to the weights, and put new node with random position (using uniform distribution) within the chosen subsquare. With probablity $\gamma$ we use uniform network algorithm to generate a new node.
 
 \section{Gadget networks}
 
 Gadget network is a special class of network designed to be  ``hard" for algorithms.
 
 \chapter{Algorithms}
+
+We present few broadcast algorithms for SINR model.
+
+\section{Density-aware}
+
+We divide the surface into squares of size $\epsilon$. Each node knows how the number $\Delta$ of all nodes in its square. After end of a round, each nodes that already got the message decides to transmit with probability:
+
+\begin{equation}
+\label{eq:dens_alg_prob}
+P = C  \epsilon^3  \min\{4, \frac{1}{\alpha - 2}, \ln n\}
+\end{equation}
+
+where $C$ is a constant, $n$ is the network size and $\alpha$ is a model  parameter.
+
+\chapter{Experiments and results}
 
 \begin{thebibliography}{9}
 
