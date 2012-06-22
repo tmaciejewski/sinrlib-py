@@ -1,4 +1,6 @@
-* Noise
+* optymalizacja generowania social network
+
+* losowy noise
  
 * losowe uid
 
