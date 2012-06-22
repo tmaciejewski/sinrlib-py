@@ -65,9 +65,7 @@ class Model:
             while len(queue) > 0:
                 uid = queue.pop()
                 visited_nodes.add(uid)
-                for neighbor in self.links[uid]:
-                    if not neighbor in visited_nodes:
-                        queue.add(neighbor)
+                queue.update(self.links[uid] - visited_nodes)
 
             components.append(visited_nodes)
             nodes -= visited_nodes
