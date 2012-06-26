@@ -26,11 +26,13 @@ class Model:
         self.nodes = {}
         self.links = {}
         self.power_cache  = {}
+        self.failed_transmit = 0
+        self.success_transmit = 0
 
     def power(self, sender, receiver):
-        if (sender, receiver) in self.power_cache:
+        try:
             return self.power_cache[(sender, receiver)]
-        else:
+        except KeyError:
             dist = self.nodes[sender] - self.nodes[receiver]
             p = self.config.power / dist ** self.config.alpha
             self.power_cache[(sender, receiver)] = p
@@ -49,8 +51,12 @@ class Model:
                         SINR = self.power(sender, receiver) / (interference + noise)
                         if SINR >= self.config.beta:
                             success.add(receiver)
+                            self.success_transmit += 1
+                        else:
+                            self.failed_transmit += 1
                     except ZeroDivisionError:
                         success.add(receiver)
+                        self.success_transmit += 1
                 
         return success
 
