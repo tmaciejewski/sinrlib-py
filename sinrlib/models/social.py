@@ -1,4 +1,4 @@
-import model, random
+import model, random, math
 
 class SocialModel(model.Model):
     def uniform_sel(self, s):
@@ -7,41 +7,34 @@ class SocialModel(model.Model):
 
         return x, y
 
-    def update_weights(self, s, e, uid):
-        tiles = int(s / e) 
-        node = self.nodes[uid]
-        i = tiles - 1 - int(node.y / e)
-        j = int(node.x / e)
-        tile = i * tiles + j
-
+    def update_weights(self, uid):
+        tile = self.uid_to_tile[uid]
+        tiles2 = set()
+        uid_sec_links = set()
         for uid1 in self.links[uid]:
+            tile1 = self.uid_to_tile[uid1]
+            
+            # tell my link about my other links
+            self.sec_links[tile1].update(self.links[uid].difference(set([uid1])))
+            
             for uid2 in self.links[uid1]:
                 if uid != uid2:
-                    node2 = self.nodes[uid2]
-                    i = tiles - 1 - int(node2.y / e)
-                    j = int(node2.x / e)
-                    tile2 = i * tiles + j
-
+                    tiles2.add(self.uid_to_tile[uid2])
                     self.sec_links[tile].add(uid2)
-                    self.sec_links[tile2].add(uid)
 
-    def social_sel(self, s, e):
-        tiles = int(s / e) 
+        for tile2 in tiles2:
+            self.sec_links[tile2].add(uid)
+
+    def social_sel(self, e):
         weights = [ len(links) for links in self.sec_links ]
 
-        #print 'Weights: '
-        #for i in range(tiles):
-        #    for j in range(tiles):
-        #        print weights[i * tiles + j], '   ',
-        #    print
-
         tile = self.weight_random(weights)
-        i = tile / tiles
-        j = tile % tiles
+        i = tile / self.tiles
+        j = tile % self.tiles
 
         e_x, e_y = self.uniform_sel(e)
         x = j * e + e_x
-        y = (tiles - i - 1) * e + e_y
+        y = (self.tiles - i - 1) * e + e_y
 
         return x, y
         
@@ -65,49 +58,47 @@ class SocialModel(model.Model):
     def generate(self, n, s, e, range_e, gamma):
         self.nodes = {}
         self.links = {}
+        self.uid_to_tile = {}
+        self.tiles = int(math.ceil(float(s) / e)) 
         uid = 0
-        tiles = int(s / e) 
 
         self.sec_links = []
-        for _ in range(tiles):
-            for _ in range(tiles):
+        for _ in range(self.tiles):
+            for _ in range(self.tiles):
                 self.sec_links.append(set())
 
         while True:
             if random.random() < gamma:
                 # uniform
-                #print 'Uniform selection'
                 x, y = self.uniform_sel(s)
             else:
                 # social
-                #print 'Social selection'
-                x, y = self.social_sel(s, e)
+                x, y = self.social_sel(e)
                 
             node = model.Node(x, y)
-            self.links[uid] = []
+            self.links[uid] = set()
+
+            i = self.tiles - 1 - int(y / e)
+            j = int(x / e)
+            self.uid_to_tile[uid] = i * self.tiles + j
 
             for uid2, node2 in self.nodes.iteritems():
                 if node - node2 <= (1 - range_e) * self.config.range:
-                    self.links[uid].append(uid2)
-                    self.links[uid2].append(uid)
+                    self.links[uid].add(uid2)
+                    self.links[uid2].add(uid)
 
             self.nodes[uid] = node
 
-            self.update_weights(s, e, uid)
+            self.update_weights(uid)
 
             uid += 1
 
-            components = self.connected_components()
-            for comp in components:
-                if len(comp) == n:
-                    nodes = {}
-                    links = {}
-                    for uid in comp:
-                        nodes[uid] = self.nodes[uid]
-                        links[uid] = []
-                        for uid2 in self.links[uid]:
-                            if uid2 in comp:
-                                links[uid].append(uid2)
-                    self.nodes = nodes
-                    self.links = links
-                    return
+            #if len(self.nodes) % 100 == 0:
+            #    print 'len:', len(self.nodes)
+
+            if len(self.nodes) >= n:
+                for comp in self.connected_components():
+                    if len(comp) >= n:
+                        self.nodes = {uid : self.nodes[uid] for uid in comp}
+                        self.links = {uid : self.links[uid].intersection(comp) for uid in comp}
+                        return

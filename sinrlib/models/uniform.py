@@ -23,10 +23,7 @@ class UniformModel(model.Model):
 
             if len(self.nodes) >= n:
                 for comp in self.connected_components():
-                    if len(comp) == n:
-                        nodes = {}
-                        for uid in comp:
-                            nodes[uid] = self.nodes[uid]
-                            self.links[uid].intersection_update(comp)
-                        self.nodes = nodes
+                    if len(comp) >= n:
+                        self.nodes = {uid : self.nodes[uid] for uid in comp}
+                        self.links = {uid : self.links[uid].intersection(comp) for uid in comp}
                         return
