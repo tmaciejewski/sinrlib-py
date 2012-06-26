@@ -6,7 +6,7 @@ class DensityAlgorithm():
         self.e = e
         self.C = C
 
-    def eval_density(self, nodes, e):
+    def eval_ppb(self, nodes, e):
         density = {}
         for uid in nodes:
             x = int(nodes[uid].x / e)
@@ -18,18 +18,16 @@ class DensityAlgorithm():
 
         for uids in density.itervalues():
             for uid in uids:
-                self.density[uid] = len(uids)
-        
+                self.ppb[uid] = self.d / len(uids)
+                #print uid, 'ppb:', self.d, '/',  len(uids), '=', self.ppb[uid]
 
     def init(self, nodes, links):
         self.nodes = nodes.keys()
         self.N = len(nodes)
-        self.density = {}
+        self.ppb = {}
         self.active = set()
         self.d = self.C * self.e**3 * min(4, 1.0 / (self.alpha - 2), math.log(self.N))
-        self.eval_density(nodes, self.e)
-
-
+        self.eval_ppb(nodes, self.e)
         return {random.choice(self.nodes)}
 
     def on_round_end(self, uid, messages, round_number):
@@ -37,8 +35,7 @@ class DensityAlgorithm():
                 self.active.add(uid)
 
         if uid in self.active:
-            #print 'd/D:', self.d,  self.density[uid]
-            return random.random() < self.d / self.density[uid]
+            return random.random() < self.ppb[uid]
         else:
             return False
 
