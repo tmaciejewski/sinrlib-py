@@ -18,6 +18,9 @@ class Simulation:
     def __init__(self, model, noise_factory):
         self.model = model
         self.noise_factory = noise_factory
+        self.success = 0
+        self.failed = 0
+        self.empty_rounds = 0
 
     def run(self, algorithm):
         round_number = 0
@@ -33,15 +36,19 @@ class Simulation:
             new_senders = set()
             messages = {}
 
+            if round_number % 100000 == 0 and round_number > 0:
+                print 'round:', round_number
+ 
             if round_number > 1000000:
                 raise AlgorithmFailed
 
-            #print 'senders:', senders
+
+            if len(senders) == 0:
+                self.empty_rounds += 1
 
             # eval model
             receivers = self.model.eval(senders)
-
-            #print 'receivers:', receivers
+            #print 'senders:', len(senders), 'receiver:', len(receivers)
 
             for uid in self.model.nodes:
                 if uid in receivers:
