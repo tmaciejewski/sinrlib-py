@@ -1,27 +1,50 @@
 #!/usr/bin/python
 
 import sys, random
-
-sys.path.append('sinrlib')
-
-from config import Config
-from models.gauss import GaussModel
-from models.uniform import UniformModel
-from models.social import SocialModel
-from models.gadget import GadgetModel
+import sinrlib
 
 def main():
-    config = Config()
+    N = 200
+    s = 10
+    e = .05
+
+    config = sinrlib.Config()
 
     if sys.argv[1] == 'uniform':
-        model = UniformModel(config)
-        model.generate(200, 8)
+        model = sinrlib.UniformModel(config)
+        model.generate(N, s, 1-6*e)
     elif sys.argv[1] == 'social':
-        model = SocialModel(config)
-        model.generate(200, 10, 2, 0.1)
+
+        model = sinrlib.SocialModel(config)
+        model.generate(N, s, e, 1 - e*6, .1)
+        
+        #print 'Weights: '
+        #for i in range(model.tiles):
+        #    for j in range(model.tiles):
+        #        print len(model.sec_links[i * model.tiles + j]), '\t',
+        #    print
+
+        #print 'Should be: '
+        #for i in range(model.tiles):
+        #    for j in range(model.tiles):
+        #        tile = i * model.tiles + j
+        #        sec_links = set()
+        #        for uid in model.nodes:
+        #            uid_i = model.tiles - 1 - int(model.nodes[uid].y / e)
+        #            uid_j = int(model.nodes[uid].x / e)
+        #            if tile == uid_i * model.tiles + uid_j:
+        #                for uid1 in model.links[uid]:
+        #                    for uid2 in model.links[uid1]:
+        #                        if uid != uid2:
+        #                            sec_links.add(uid2)
+        #        print len(sec_links), '\t',
+        #    print
+
     elif sys.argv[1] == 'gadget':
-        model = GadgetModel(config)
+        model = sinrlib.GadgetModel(config)
         model.generate(10, 5, 0.1)
+
+    print 'generated'
 
     #for i in range(100):
     #    n = random.randint(30,200)
@@ -34,6 +57,9 @@ def main():
     #        pass                
 
     model.show('Network')            
+    #model.export_to_pdf('model.png', 'N = %d' % N)
 
 if __name__ == "__main__":
+    import cProfile
+    #cProfile.run('main()')
     main()
