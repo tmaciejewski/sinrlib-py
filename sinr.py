@@ -1,25 +1,21 @@
 #!/usr/bin/python
 
 import math, sys
-
+import sinrlib
 from matplotlib import pyplot
-
 from algorithms.naive import Algorithm1
 from algorithms.density import DensityAlgorithm
-from sinrlib.config import Config
-from sinrlib.simulation import Simulation, AlgorithmFailed
-from sinrlib.models.uniform import UniformModel
-from sinrlib.noise.const import ConstNoise
 
 def main():
-    config = Config()
-    model = UniformModel(config)
+    config = sinrlib.Config()
+    #model = sinrlib.UniformModel(config)
+    model = sinrlib.SocialModel(config)
     tries = int(sys.argv[1])
     start, end, step = [int(arg) for arg in sys.argv[2].split(',')]
 
     C = 10
     e = 0.1
-    S = 1
+    S = 4
 
     avgs = []
     stds = []
@@ -29,17 +25,20 @@ def main():
         results = []
         while len(results) < tries:
             try:
-                model.generate(N, 1, 1 - 6*e)
-                simulation = Simulation(model, lambda: ConstNoise(1.0))
+                model.generate(N, S, e, 1 - 6*e, 0.1)
+                simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
                 algorithm = DensityAlgorithm(config, e, C)
                 results.append(simulation.run(algorithm))
                 sys.stdout.write('.')
                 sys.stdout.flush()
-            except AlgorithmFailed:
-                print 'algorithm failed!'
+            except sinrlib.AlgorithmFailed:
+                print >> sys.stderr, 'algorithm failed!'
+                print 'empty rounds:', simulation.empty_rounds
+                print 'failed:', model.failed_transmit
+                print 'success:', model.success_transmit
                 for uid in algorithm.nodes:
                     if not uid in algorithm.active:
-                        print model.nodes[uid], 'is inactive'
+                        print >> sys.stderr, model.nodes[uid], 'is inactive'
                 #model.show()
 
         avg = float(sum(results)) / len(results)
@@ -61,6 +60,6 @@ def main():
     pyplot.show()
 
 if __name__ == "__main__":
-    #import cProfile
+    import cProfile
     #cProfile.run('main()')
     main()

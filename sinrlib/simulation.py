@@ -8,9 +8,6 @@ class Algorithm:
     def is_done(self):
         return True
 
-class Message:
-    pass
-
 class AlgorithmFailed(Exception):
     pass
 
