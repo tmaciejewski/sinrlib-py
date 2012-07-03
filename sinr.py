@@ -8,8 +8,6 @@ from algorithms.density import DensityAlgorithm
 
 def main():
     config = sinrlib.Config()
-    #model = sinrlib.UniformModel(config)
-    model = sinrlib.SocialModel(config)
     tries = int(sys.argv[1])
     start, end, step = [int(arg) for arg in sys.argv[2].split(',')]
 
@@ -25,7 +23,8 @@ def main():
         results = []
         while len(results) < tries:
             try:
-                model.generate(N, S, e, 1 - 6*e, 0.1)
+                #model = sinrlib.UniformModel(config, N, S, 1 - 6*e)
+                model = sinrlib.SocialModel(config, N, S, e, 1 - 6*e, 0.1)
                 simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
                 algorithm = DensityAlgorithm(config, e, C)
                 results.append(simulation.run(algorithm))

@@ -11,12 +11,9 @@ def main():
     config = sinrlib.Config()
 
     if sys.argv[1] == 'uniform':
-        model = sinrlib.UniformModel(config)
-        model.generate(N, s, 1-6*e)
+        model = sinrlib.UniformModel(config, N, s, 1-6*e)
     elif sys.argv[1] == 'social':
-
-        model = sinrlib.SocialModel(config)
-        model.generate(N, s, e, 1 - e*6, .1)
+        model = sinrlib.SocialModel(config, N, s, e, 1 - e*6, .1)
         
         #print 'Weights: '
         #for i in range(model.tiles):
@@ -33,7 +30,7 @@ def main():
         #            uid_i = model.tiles - 1 - int(model.nodes[uid].y / e)
         #            uid_j = int(model.nodes[uid].x / e)
         #            if tile == uid_i * model.tiles + uid_j:
-        #                for uid1 in model.links[uid]:
+        #0                for uid1 in model.links[uid]:
         #                    for uid2 in model.links[uid1]:
         #                        if uid != uid2:
         #                            sec_links.add(uid2)
@@ -41,8 +38,7 @@ def main():
         #    print
 
     elif sys.argv[1] == 'gadget':
-        model = sinrlib.GadgetModel(config)
-        model.generate(10, 5, 0.1)
+        model = sinrlib.GadgetModel(config, 10, 5, 0.1)
 
     print 'generated'
 

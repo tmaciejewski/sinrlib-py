@@ -1,7 +1,9 @@
 import model, random, math
 
 class GadgetModel(model.Model):
-    def generate(self, m, p, e):
+    def __init__(self, config, m, p, e):
+        model.Model.__init__(self, config)
+
         self.nodes = {}
         self.links = {}
         
