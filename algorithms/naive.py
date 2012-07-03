@@ -1,6 +1,6 @@
 import random
 
-class Algorithm1():
+class NaiveAlgorithm():
     def init(self, nodes, links):
         self.nodes = nodes.keys()
         self.N = len(nodes)

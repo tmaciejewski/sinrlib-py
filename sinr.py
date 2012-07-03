@@ -1,10 +1,8 @@
 #!/usr/bin/python
 
 import math, sys
-import sinrlib
+import sinrlib, algorithms
 from matplotlib import pyplot
-from algorithms.naive import Algorithm1
-from algorithms.density import DensityAlgorithm
 
 def main():
     config = sinrlib.Config()
@@ -26,7 +24,7 @@ def main():
                 #model = sinrlib.UniformModel(config, N, S, 1 - 6*e)
                 model = sinrlib.SocialModel(config, N, S, e, 1 - 6*e, 0.1)
                 simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
-                algorithm = DensityAlgorithm(config, e, C)
+                algorithm = algorithms.DensityAlgorithm(config, e, C)
                 results.append(simulation.run(algorithm))
                 sys.stdout.write('.')
                 sys.stdout.flush()
