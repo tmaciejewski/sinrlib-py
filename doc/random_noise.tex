@@ -2,6 +2,8 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \allowdisplaybreaks
 
@@ -83,15 +85,66 @@ We used three methods for generating network graphs:
 
 Uniforms networks are random graphs generated using a uniform distribution. Each node has a position in $[0, S] \times [0, S]$ square.
 
+\begin{algorithm}
+\caption{Uniform network generation}
+\label{a:uniform}
+\begin{algorithmic}
+\Function{uniform-node}{$S$}
+	\State $x \gets \text{random}(0, S)$
+	\State $y \gets \text{random}(0, S)$
+	\State \Return $(x, y)$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
 \section{Social networks}
 
-Social networks tries to model human behaviour of connecting into larger group. Nodes are generated within a square $[0, S] \times [0, S]$. The square is divided into subsquares of size $\epsilon$. We define $s_{i,j}$ to be a set of nodes in a subsquare in i-th row and j-th column. To a subsquare $s_{i,j}$ we assign a weight:
+Social networks tries to model human behaviour of connecting into larger group. Nodes are generated within a square $[0, S] \times [0, S]$. The square is divided into tiles of size $\epsilon$. We define $t_{i,j}$ to be a set of nodes in a tile in i-th row and j-th column. To a tile $t_{i,j}$ we assign a weight:
 
 \begin{equation*}
-w_{i,j} = \left| \bigcup_{v \in s_{i,j}} E(E(v)) \right|
+w_{i,j} = \left|seclinks_{t_{i,j}} \right|
+\end{equation*}
+\begin{equation*}
+seclinks_t =  \bigcup_{v \in t} E(E(v))
 \end{equation*}
 
-With probability $1 - \gamma$ we choose a subsquare $s$ according to the weights, and put new node with random position (using uniform distribution) within the chosen subsquare. With probablity $\gamma$ we use uniform network algorithm to generate a new node.
+With probability $1 - \gamma$ we choose a tile $t$ according to the weights, and put new node with random position (using uniform distribution) within the chosen tile. With probablity $\gamma$ we use uniform network algorithm to generate a new node.
+
+The algorithm keeps track of current $seclinks$ values and updates them in \textsc{update-weights} after every new node.
+
+\begin{algorithm}
+\caption{Social network generation}
+\label{a:social}
+\begin{algorithmic}
+\Function{update-weights}{v}
+	\State let $v \in t$
+	\For{$v' \in E(v)$}
+		\State let $v' \in t'$
+		\State $seclinks_{t'} \gets seclinks_{t'} \cup (E(v)  \setminus \{v'\})$
+		\For{$v'' \in E(v')$}
+			\If{$v \neq v'$'}
+				\State let $v'' \in t''$
+				\State $seclinks_{t''} \gets seclinks_{t''} \cup \{v\}$
+				\State $seclinks_t \gets seclikns_t \cup \{v''\}$
+			\EndIf
+		\EndFor
+	\EndFor
+\EndFunction
+
+\Statex
+
+\Function{social-node}{$S, e, \gamma$}
+	\If{$\text{random()} < \gamma$}
+		\State \Return \textsc{uniform-node}(S)
+	\Else
+		\State $tile \gets \textsc{weight-random}(W)$
+		\State $(e_x, e_y) \gets \textsc{uniform-node}(e)$
+		
+		\State \Return $(tile.x + e_x, tile.y + e_y)$
+	\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
 
 \section{Gadget networks}
 
@@ -99,18 +152,62 @@ Gadget network is a special class of network designed to be  ``hard" for algorit
 
 \chapter{Algorithms}
 
-We present few broadcast algorithms for SINR model.
+We present few broadcast algorithms for SINR model. Each algorithm is run in distributed network and consist of three function---\textsc{Init}, \textsc{on-round-end} and \textsc{is-done}---executed for every node in the network.
 
-\section{Density-aware}
+\textsc{init} is executed globally at the beginning. Its purpose is to setup and initialize each node. The return value indicated the set of nodes that fiest hold the message.
 
-We divide the surface into squares of size $\epsilon$. Each node knows how the number $\Delta$ of all nodes in its square. After end of a round, each nodes that already got the message decides to transmit with probability:
+\textsc{on-round-end} is executed for every node at the end of each round. The node knows what is the current round number and whether it received any message. If the return  value  is true, then the node will be transmiting in the round. Otherwise it will be receiving.
 
-\begin{equation}
+\textsc{is-done} is executed globally at the end of each round. The return value is true, when the algorithm is done.
+
+\section{Density-aware algorithm}
+
+We divide the surface into tiles of size $\epsilon$. Each node knows how the number $\Delta$ of all nodes in its tile. After end of a round, each node $v$ that already got the message decides to transmit with probability :
+
+\begin{align}
 \label{eq:dens_alg_prob}
-P = C  \epsilon^3  \min\{4, \frac{1}{\alpha - 2}, \ln n\}
-\end{equation}
+P_v &= C  \frac{d}{\Delta} \\
+d &= \epsilon^3  \min\{4, \frac{1}{\alpha - 2}, \ln n\} \nonumber
+\end{align}
 
 where $C$ is a constant, $n$ is the network size and $\alpha$ is a model  parameter.
+
+\begin{algorithm}
+\caption{Density-aware algorithm}
+\label{a:density}
+\begin{algorithmic}
+\Function{init}{V}
+        \State $d \gets C e^3 \min\{4, \frac{1}{\alpha - 2}, \log N\}$
+        \State $\forall v_i \in V \, active_i \gets 0$
+        \State $\forall v_i \in V \,density_i \gets |\{v \in V :  v \text{ is in the same tile as } v_i\}|$
+        \State $\forall v_i \in V \,P_i \gets \frac{d}{density_i}$
+        \State \Return $\{\text{random}(V)\}$
+\EndFunction
+
+\Statex
+
+\Function{is-done}{}
+	\If{$\forall v_i \in V \, active_i = true$}
+		\State \Return true
+	\Else
+		\State \Return false
+	\EndIf
+\EndFunction
+
+\Statex
+
+\Function{on-round-end}{$S, v_i, messages, round_number$}
+	\If{$messages$}
+		\State $active_i \gets 1$
+	\EndIf
+	\If{$active_i$}
+		\State \Return $\text{random()} < P_i$
+	\Else
+		\State \Return 0
+	\EndIf 
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
 
 \chapter{Experiments and results}
 
