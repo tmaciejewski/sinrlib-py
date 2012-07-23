@@ -19,6 +19,8 @@ class Node:
     def __str__(self):
         return 'Node(%s, %s)' % (self.x, self.y)
         
+    def __repr__(self):
+        return self.__str__()
 
 class Model:
     def __init__(self, config):
