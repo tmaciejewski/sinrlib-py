@@ -1,2 +1,4 @@
 from density import DensityAlgorithm
 from naive import NaiveAlgorithm
+from densityunknown import DensityUnknownAlgorithm
+from densityknown import DensityKnownAlgorithm
