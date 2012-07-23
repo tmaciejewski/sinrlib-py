@@ -30,7 +30,7 @@ class Simulation:
         senders = algorithm.init(self.model.nodes, self.model.links)
 
         while not algorithm.is_done():
-            new_senders = set()
+            new_senders = []
             messages = {}
 
             if round_number % 100000 == 0 and round_number > 0:
@@ -49,12 +49,12 @@ class Simulation:
 
             for uid in self.model.nodes:
                 if uid in receivers:
-                    messages[uid] = True
+                    messages = receivers[uid]
                 else:
-                    messages[uid] = False
+                    messages = []
 
-                if algorithm.on_round_end(uid, messages[uid], round_number):
-                    new_senders.add(uid)
+                if algorithm.on_round_end(uid, messages, round_number):
+                    new_senders.append(uid)
 
             senders = new_senders
 

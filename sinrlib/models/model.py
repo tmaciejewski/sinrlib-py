@@ -41,9 +41,10 @@ class Model:
             return self.power_cache[(sender, receiver)]
 
     def eval(self, senders):
-        success = set()
+        result = {}
         for sender in senders:
             for receiver in self.links[sender]:
+                success = False
                 # nodes can't send and receive simultanously
                 if receiver not in senders: 
                     interference = sum([self.power(node, receiver) \
@@ -52,15 +53,21 @@ class Model:
                     try:
                         SINR = self.power(sender, receiver) / (interference + noise)
                         if SINR >= self.config.beta:
-                            success.add(receiver)
-                            self.success_transmit += 1
-                        else:
-                            self.failed_transmit += 1
+                            success = True
                     except ZeroDivisionError:
-                        success.add(receiver)
-                        self.success_transmit += 1
+                        success = True
                 
-        return success
+                if success:
+                    if receiver in result:
+                        result[receiver].append(sender)
+                    else:
+                        result[receiver] = [sender]
+
+                    self.success_transmit += 1
+                else:
+                    self.failed_transmit += 1
+
+        return result
 
     def connected_components(self):
         components = []
