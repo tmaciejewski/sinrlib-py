@@ -25,13 +25,14 @@ class DensityAlgorithm():
         self.nodes = nodes.keys()
         self.N = len(nodes)
         self.ppb = {}
-        self.active = set()
         self.d = self.C * self.e**3 * min(4, 1.0 / (self.alpha - 2), math.log(self.N))
         self.eval_ppb(nodes, self.e)
-        return {random.choice(self.nodes)}
+        source = random.choice(self.nodes)
+        self.active = {source}
+        return self.active
 
     def on_round_end(self, uid, messages, round_number):
-        if messages == True:
+        if messages != []:
                 self.active.add(uid)
 
         if uid in self.active:
