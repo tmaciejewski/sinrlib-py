@@ -1,14 +1,14 @@
-\documentclass[a4paper,draft,12pt]{report}
+\documentclass[a4paper,12pt]{report}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{graphicx}
 
 \allowdisplaybreaks
 
 \title{Broadcast algorithms in SINR model with random noise}
-
 
 \begin{document}
 
@@ -196,7 +196,7 @@ where $C$ is a constant, $n$ is the network size and $\alpha$ is a model  parame
 
 \Statex
 
-\Function{on-round-end}{$S, v_i, messages, round_number$}
+\Function{on-round-end}{$v_i, messages, round_number$}
 	\If{$messages$}
 		\State $active_i \gets 1$
 	\EndIf
@@ -210,6 +210,46 @@ where $C$ is a constant, $n$ is the network size and $\alpha$ is a model  parame
 \end{algorithm}
 
 \chapter{Experiments and results}
+
+Simulation was performed on networks of size from 100 to 1000. The algorithm was executed on 40 networks of each size. Average result and standard deviation was saved.
+
+\section{Constant noise}
+
+\begin{figure}
+\centering
+\includegraphics[width=400px]{../results/uniform1}
+\caption{Uniform network}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=400px]{../results/uniform2}
+\caption{Uniform network}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=400px]{../results/uniform3}
+\caption{Uniform network}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=400px]{../results/social1}
+\caption{Social network}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=400px]{../results/social2}
+\caption{Social network}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=400px]{../results/social3}
+\caption{Social network}
+\end{figure}
 
 \begin{thebibliography}{9}
 
