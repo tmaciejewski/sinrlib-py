@@ -79,7 +79,24 @@ class Model:
             nodes -= visited_nodes
 
         return components
-        
+    
+    def diameter(self):
+        return max([self.diameter_bfs(uid) for uid in self.nodes.keys()])
+
+    def diameter_bfs(self, start_uid):
+        visited = set([start_uid])
+        queue = [start_uid]
+        dist = {start_uid : 0}
+
+        while len(queue) > 0:
+            uid = queue.pop(0)
+            for uid2 in self.links[uid] - visited:
+                dist[uid2] = dist[uid] + 1 
+                visited.add(uid2)
+                queue.append(uid2)
+
+        return max(dist.itervalues())
+
     def show(self, title = 'Network'):
         self.plot(title)
         matplotlib.pyplot.show()
