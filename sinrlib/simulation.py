@@ -19,8 +19,9 @@ class Simulation:
         self.failed = 0
         self.empty_rounds = 0
 
-    def run(self, algorithm):
+    def run(self, algorithm, max_rounds = 1000000):
         round_number = 0
+        warn_step = int(max_rounds / 10)
 
         # setup noise
         for uid in self.model.nodes:
@@ -33,10 +34,10 @@ class Simulation:
             new_senders = []
             messages = {}
 
-            if round_number % 100000 == 0 and round_number > 0:
+            if round_number % warn_step == 0 and round_number > 0:
                 print 'round:', round_number
  
-            if round_number > 1000000:
+            if round_number > max_rounds:
                 raise AlgorithmFailed
 
 
