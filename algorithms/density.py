@@ -43,7 +43,3 @@ class DensityAlgorithm():
     def is_done(self):
         #print 'progress:', len(self.active) / float(self.N)
         return len(self.active) == self.N
-
-if __name__ == "__main__":
-    Algorithm1()
-
