@@ -6,29 +6,34 @@ class State:
         box_x = int(x / gamma)
         box_y = int(y / gamma)
         self.box = (box_x, box_y)
-        self.leaders_transimts = True
+        self.phase = 0
         self.phase_round = 0
         self.conflict = False
+        self.candidated = False
         self.known_leaders = set()
+        self.helper = None
+        self.helped = False
 
     def __str__(self):
-        return '(leader = %s, box = %s, known_leaders = %s)' \
-                % (self.leader, self.box, self.known_leaders)
+        return '(leader = %s, box = %s, known_leaders = %s,' \
+                'phase = %s %s, conflict = %s, candidated = %s)' \
+                % (self.leader, self.box, self.known_leaders, \
+                self.phase, self.phase_round, self.conflict, self.candidated)
 
 class DensityUnknownAlgorithm():
-    def __init__(self, config, e, C):
+    def __init__(self, config, e, C, d, dprim):
         self.alpha = config.alpha
         self.e = e
         self.C = C
         self.gamma = e / (math.sqrt(2) * 6)
+        self.d = d
+        self.dprim = dprim
         self.last_progress = 0
 
     def init(self, nodes, links):
         self.nodes = nodes
         self.N = len(nodes)
-        self.d = 4
-        self.logn = int(math.log(self.N))
-        self.dprim = 4
+        self.logn = int(math.log(self.N, 2))
         self.state = {}
         for uid in self.nodes:
             self.state[uid] = State(nodes[uid].x, nodes[uid].y, self.gamma)
@@ -40,22 +45,46 @@ class DensityUnknownAlgorithm():
     def on_round_end(self, uid, messages, round_number):
         state = self.state[uid]
 
-        if messages != []:
-            self.active.add(uid)
-
-        if state.leaders_transimts:
-            res = self.leaders_transmits(uid, messages, round_number)
+        #print 'state for', uid,'->', state
+        if state.phase == 0:
+            # leader transmission phase
+            if uid == state.leader:
+                res = self.leaders_transmits(uid, messages, round_number)
+            else:
+                res = self.nonleaders_listen(uid, messages, round_number)
             state.phase_round += 1
             if state.phase_round >= self.d**2:
-                state.leaders_transimts = False
-                state.phase_round = [0, 0, 0]
-                state.conflict = False
+                state.phase = 1
+            return res
+        elif state.phase == 1:
+            # if not a leader
+            if uid != state.leader:
+                res = self.nonleaders_listen(uid, messages, round_number)
+            else:
+                res = False
+            state.phase = 2
+            state.phase_round = [0, 0, 0]
+            state.conflict = False
+            if state.leader == None:
+                # no leader in a box
+                state.helper = self.election_helper(uid)
+                #print uid, 'in box', state.box, 'has helper', state.helper
+            return res
         else:
-            if state.conflict == False and state.leader == None:
-                res = self.leader_election(uid, messages, round_number)
-            elif state.leader == uid:
-                # leader election helper
-                res = self.election_helper(uid, messages, round_number)
+            if uid in self.active:
+                # leader election phase
+                if state.conflict == False and state.leader == None \
+                        and state.helper != None:
+                    # don't have leader and no conflict so far
+                    res = self.leader_election(uid, messages, round_number)
+                elif state.leader == uid:
+                    # uid is leader, and maybe is also a helper
+                    res = self.election_help(uid, messages, round_number)
+                else:
+                    # not a leader, maybe conflict, maybe slave, etc.
+                    res = False
+            else:
+                res = False
 
             state.phase_round[2] += 1
 
@@ -68,27 +97,40 @@ class DensityUnknownAlgorithm():
                 state.phase_round[0] += 1
 
             if state.phase_round[0] >= self.dprim**2:
-                state.leaders_transimts = False
                 state.phase = 0
+                state.phase_round = 0
 
-        return res
+            return res
 
     def leaders_transmits(self, uid, messages, round_number):
         state = self.state[uid]
+        a = int(state.phase_round / self.d)
+        b = int(state.phase_round % self.d)
+        if state.box[0] % self.d == a and state.box[1] % self.d == b:
+            # if it's uid's time to send
+            return True
+        else:
+            return False
+
+    def nonleaders_listen(self, uid, messages, round_number):
+        state = self.state[uid]
+
+        if messages != [] and uid not in self.active:
+            # got any message? wake up
+            self.active.add(uid)
+            #print uid, 'wakes up'
 
         for sender in messages:
+            # add known leaders
             state.known_leaders.add(sender)
-            print uid, 'know a leader', sender
+            #print uid, 'knows a new leader', sender
 
-        if state.leader == uid:
-            a = int(state.phase_round / self.d)
-            b = int(state.phase_round % self.d)
-            if state.box[0] % self.d == a and state.box[1] % self.d == b:
-                #print uid, 'transmits'
-                return True
-            else:
-                #print 'in', state.box, 'not transmiting because of', (a,b)
-                return False
+            # check if this is my leader
+            if self.state[sender].box == state.box:
+                state.leader = sender
+                #print uid, 'knows its leader', sender
+
+        return False
 
     def leader_election(self, uid, messages, round_number):
         state = self.state[uid]
@@ -97,33 +139,84 @@ class DensityUnknownAlgorithm():
         b = int(state.phase_round[0] % self.d)
         if state.box[0] % self.d == a and state.box[1] % self.d == b:
             if state.phase_round[2] == 0:
-                pbb = (1 / self.N) * 2 ** state.phase_round[1]
+                p = (1.0 / self.N) * 2 ** state.phase_round[1]
                 # transmit with pbb
+                if random.random() < p:
+                    #print uid, 'candidating for a leader'
+                    state.candidated = True
+                    return True
+                else:
+                    return False
             elif state.phase_round[2] == 1:
-                # wait for u
-                pass
+                # wait for helper
+                return False
             elif state.phase_round[2] == 2:
                 # if heard u? if transmitted, I'm the leader
                 # transmitting if leader
-                pass
+                if state.candidated:
+                    if state.helper in messages:
+                        #print uid, 'won the leadership, celebrating'
+                        state.leader = uid
+                        return True
+                    else:
+                        #print uid, 'didn\'t win'
+                        state.conflict = True
+                        return False
+                else:
+                    return False
             elif state.phase_round[2] == 3:
-                # other nodes receiver the leader's and u's message
-                pass
+                # other nodes receives the leader's and u's message
+                if state.helper not in messages:
+                    #print uid, 'didn\'t hear helper in K3!'
+                    state.conflict = True
+                else:
+                    for s in messages:
+                        if self.state[s].box == state.box:
+                            # discovered a leader
+                            #print uid, 'respects', s, 'as a leader'
+                            state.leader = s
+                return False
+        else:
+            return False
 
-    def election_helper(self, uid, messages, round_number):
+    def election_help(self, uid, messages, round_number):
         state = self.state[uid]
         if state.phase_round[2] == 0:
             # wait for leader candidate
-            pass
+            return False
         elif state.phase_round[2] == 1:
             # respond to the leader candidate
-            pass
+            if any([self.state[s].helper == uid for s in messages]):
+                # if any message and uid is the helper
+                #print 'helper', uid, 'helps:', messages
+                state.helped = True
+                return True
+            else:
+                state.helped = False
+                return False
         elif state.phase_round[2] == 2:
             # transmit with the leader
-            pass
+            if state.helped:
+                #print uid , 'is helping someone, so it transmits'
+                return True
+            else:
+                return False
         elif state.phase_round[2] == 3:
             # wait for other
-            pass
+            return False
+
+    def election_helper(self, uid):
+        box = self.state[uid].box
+        helper = None
+        helper_dist = None
+        for leader in self.state[uid].known_leaders:
+            leader_box = self.state[leader].box
+            dist = math.sqrt((box[0] - leader_box[0])**2 + \
+                    (box[1] - leader_box[1])**2)
+            if helper_dist == None or dist < helper_dist:
+                helper = leader
+                helper_dist = dist
+        return helper
 
     def is_done(self):
         progress = len(self.active) / float(self.N)
@@ -131,10 +224,4 @@ class DensityUnknownAlgorithm():
             self.last_progress = progress
             print 'progress:', progress
         
-        #return len(self.active) == self.N
-        if len(self.active) > 1:
-            for uid in self.nodes:
-                print uid, 'state:', self.state[uid]
-            return True
-
-        return False
+        return len(self.active) == self.N
