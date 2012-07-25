@@ -10,32 +10,28 @@ class DensityKnownAlgorithm():
         self.phase_round = 0
 
     def eval_ppb(self, nodes, e):
+        self.ppb = {}
+        self.box = {}
         density = {}
         for uid in nodes:
-            x = int(nodes[uid].x / e)
-            y = int(nodes[uid].y / e)
-            if (x, y) in density:
-                density[(x,y)].append(uid)
+            box_x = int(nodes[uid].x / self.gamma)
+            box_y = int(nodes[uid].y / self.gamma)
+            self.box[uid] = (box_x, box_y)
+            if (box_x, box_y) in density:
+                density[(box_x, box_y)].append(uid)
             else:
-                density[(x, y)] = [uid]
+                density[(box_x, box_y)] = [uid]
 
         for uids in density.itervalues():
             for uid in uids:
                 self.ppb[uid] = float(self.C) / len(uids)
-                #print uid, 'ppnb = ', self.ppb[uid]
+                #print uid, 'in', self.box[uid], 'ppb = ', self.ppb[uid]
 
     def init(self, nodes, links):
         self.nodes = nodes
         self.N = len(nodes)
-        gamma = self.e / (2 * math.sqrt(2))
-        self.ppb = {}
+        self.gamma = self.e / (2 * math.sqrt(2))
         self.eval_ppb(nodes, self.e)
-        self.box = {}
-        for uid in nodes:
-            box_x = int(nodes[uid].x / gamma)
-            box_y = int(nodes[uid].y / gamma)
-            self.box[uid] = (box_x, box_y)
-
         source = random.choice(self.nodes.keys())
         self.active = {source}
         return {}
