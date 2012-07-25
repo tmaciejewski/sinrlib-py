@@ -43,9 +43,10 @@ class Model:
     def eval(self, senders):
         result = {}
         for sender in senders:
-            for receiver in self.links[sender]:
+            for receiver in self.nodes:
                 success = False
                 # nodes can't send and receive simultanously
+                # and can't send to themselves
                 if receiver not in senders: 
                     interference = sum([self.power(node, receiver) \
                             for node in senders if node != sender])
