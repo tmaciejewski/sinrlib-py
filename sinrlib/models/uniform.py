@@ -1,7 +1,7 @@
 import model, random
 
 class UniformModel(model.Model):
-    def __init__(self, config, n, size):
+    def __init__(self, config, n, size, range_mod):
         model.Model.__init__(self, config)
 
         self.nodes = {}
@@ -16,7 +16,7 @@ class UniformModel(model.Model):
             self.links[uid] = set([])
 
             for uid2, node2 in self.nodes.iteritems():
-                if node - node2 <= config.range:
+                if node - node2 <= range_mod:
                     self.links[uid].add(uid2)
                     self.links[uid2].add(uid)
         
