@@ -55,7 +55,7 @@ class SocialModel(model.Model):
 
         return i
 
-    def __init__(self, config, n, s, e, range_e, gamma):
+    def __init__(self, config, n, s, e, gamma):
         model.Model.__init__(self, config)
 
         self.nodes = {}
@@ -85,7 +85,7 @@ class SocialModel(model.Model):
             self.uid_to_tile[uid] = i * self.tiles + j
 
             for uid2, node2 in self.nodes.iteritems():
-                if node - node2 <= (1 - range_e) * config.range:
+                if node - node2 <= config.range:
                     self.links[uid].add(uid2)
                     self.links[uid2].add(uid)
 
