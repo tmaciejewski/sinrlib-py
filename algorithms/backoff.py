@@ -34,5 +34,9 @@ class BackoffAlgorithm():
                 return False
 
     def is_done(self):
+        progress = len(self.active)
+        if progress > self.last_progress:
+            self.last_progress = progress
+            #print 'progress:', float(progress) / self.N
         return len(self.active) == self.N
 

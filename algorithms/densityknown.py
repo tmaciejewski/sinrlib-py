@@ -61,6 +61,3 @@ class DensityKnownAlgorithm():
             #print 'progress:', progress
         return len(self.active) == self.N
 
-if __name__ == "__main__":
-    Algorithm1()
-
