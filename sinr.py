@@ -16,55 +16,49 @@ def main():
 
     C = 1
     e = 0.1
-    S = 5
-    d = 5
-    config.range = 1
+    d = 20
 
-    avgs = []
-    stds = []
-    ns  = []
-
-    alg = [ #algorithms.DensityUnknownAlgorithm(config, e, C), \
+    alg = [ #algorithms.DensityUnknownAlgorithm(config, e, C, d, d), \
             algorithms.DensityKnownAlgorithm(config, e, C, d), \
             algorithms.BackoffAlgorithm(config), \
+            #algorithms.BackoffAckAlgorithm(config), \
             ]
 
     for N in range(N_start, N_end + 1, N_step):
         S = S_start
         while S <= S_end:
+            results = {}
+            diams = []
             for algorithm in alg:
-                results = []
-                diams = []
-                while len(results) < tries:
+                results[algorithm] = []
+            for _ in range(tries):
+                #model = sinrlib.UniformModel(config, N, S, 0.9)
+                #model = sinrlib.SocialModel(config, N, S, e, 0.1)
+                #model = sinrlib.GadgetModel(config, 5, 100, 0.9)
+                model = sinrlib.Gadget2Model(config, N, S, e, 0.9)
+                #model.show()
+                diameter = model.diameter()
+                diams.append(diameter)
+                simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
+                for algorithm in alg:
                     try:
-                        model = sinrlib.UniformModel(config, N, S, 0.9)
-                        #model = sinrlib.SocialModel(config, N, S, e, 0.1)
-                        simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
-                        results.append(simulation.run(algorithm, 100000))
-                        diams.append(model.diameter())
+                        r = simulation.run(algorithm, 100000)
+                        results[algorithm].append(r)
                         sys.stdout.write('.')
                         sys.stdout.flush()
                     except sinrlib.AlgorithmFailed:
-                        print >> sys.stderr, 'algorithm failed!'
-                        print 'empty rounds:', simulation.empty_rounds
-                        print 'failed:', model.failed_transmit
-                        print 'success:', model.success_transmit
-                        for uid in algorithm.nodes:
-                            print >> sys.stderr, model.nodes[uid], 'ppb =', algorithm.ppb[uid]
-                            if not uid in algorithm.active:
-                                print >> sys.stderr, model.nodes[uid], 'is inactive'
-                        model.show()
+                        print >> sys.stderr, 'algorithm', algorithm, 'failed for N = %s, S = %s' % (N, S)
+                        #model.show()
+            print 
 
-                avg = float(sum(results)) / len(results)
-                std = math.sqrt(sum([(r - avg)**2 for r in results]) / len(results))
+
+            for algorithm in results:
+                res = results[algorithm]
+                avg = float(sum(res)) / len(res)
+                std = math.sqrt(sum([(r - avg)**2 for r in res]) / len(res))
                 avg_diam = float(sum(diams)) / len(diams)
-
-                print
-                print algorithm.__class__.__name__, N, d, e, S, avg, std, avg_diam
-
-                ns.append(N)
-                avgs.append(avg)
-                stds.append(std)
+    
+                print algorithm.__class__.__name__, N, d, e, S, avg, std, avg_diam, avg / avg_diam
 
             S += S_step
 
