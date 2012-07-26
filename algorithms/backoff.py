@@ -4,17 +4,15 @@ class BackoffAlgorithm():
     def __init__(self, config):
         self.last_progress = 0
 
-    def init(self, nodes, links):
+    def init(self, nodes, links, source):
         self.nodes = nodes
         self.N = len(nodes)
-        source = random.choice(self.nodes.keys())
         self.active = {source}
         self.phase = {}
         self.counter = {}
         for uid in self.nodes:
             self.phase[uid] = 1
             self.counter[uid] = 1
-        return {}
 
     def on_round_end(self, uid, messages, round_number):
         if messages != []:

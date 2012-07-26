@@ -1,31 +1,20 @@
 import random
 
 class NaiveAlgorithm():
-    def init(self, nodes, links):
+    def init(self, nodes, links, source):
         self.nodes = nodes.keys()
         self.N = len(nodes)
-        self.active = {}
-        return {self.nodes[0]}
+        self.active = {source}
 
     def on_round_end(self, uid, messages, round_number):
-        if messages == True:
-            try:
-                self.nodes.remove(uid)
-                self.active[uid] = True
-            except ValueError:
-                pass
+        if messages != []:
+            self.active.add(uid)
 
-        try:
-            if self.active[uid]:
-                return random.random() < (2.0 / self.N)
-        except KeyError:
-            pass
-
-        return False
+        if uid in self.active:
+            return random.random() < (2.0 / self.N)
+        else:
+            return False
 
     def is_done(self):
-        return self.nodes == []
-
-if __name__ == "__main__":
-    Algorithm1()
+        return len(self.active) == self.N
 

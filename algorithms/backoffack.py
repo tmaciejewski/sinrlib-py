@@ -12,16 +12,14 @@ class BackoffAckAlgorithm():
     def __init__(self, config):
         self.last_progress = 0
 
-    def init(self, nodes, links):
+    def init(self, nodes, links, source):
         self.nodes = nodes
         self.N = len(nodes)
-        source = random.choice(self.nodes.keys())
         self.active = {source}
         self.state = {}
         for uid in self.nodes:
             self.state[uid] = State()
         self.state[source].broadcasting = True
-        return {}
 
     def on_round_end(self, uid, messages, round_number):
         state = self.state[uid]

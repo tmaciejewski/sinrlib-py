@@ -27,14 +27,12 @@ class DensityKnownAlgorithm():
                 self.ppb[uid] = float(self.C) / len(uids)
                 #print uid, 'in', self.box[uid], 'ppb = ', self.ppb[uid]
 
-    def init(self, nodes, links):
+    def init(self, nodes, links, source):
         self.nodes = nodes
         self.N = len(nodes)
         self.gamma = self.e / (2 * math.sqrt(2))
         self.eval_ppb(nodes, self.e)
-        source = random.choice(self.nodes.keys())
         self.active = {source}
-        return {}
 
     def on_round_end(self, uid, messages, round_number):
         if messages != []:

@@ -30,17 +30,15 @@ class DensityUnknownAlgorithm():
         self.dprim = dprim
         self.last_progress = 0
 
-    def init(self, nodes, links):
+    def init(self, nodes, links, source):
         self.nodes = nodes
         self.N = len(nodes)
         self.logn = int(math.log(self.N, 2))
         self.state = {}
         for uid in self.nodes:
             self.state[uid] = State(nodes[uid].x, nodes[uid].y, self.gamma)
-        source = random.choice(self.nodes.keys())
         self.state[source].leader = source
         self.active = {source}
-        return {}
 
     def on_round_end(self, uid, messages, round_number):
         state = self.state[uid]

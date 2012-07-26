@@ -4,6 +4,10 @@ class Gadget2Model(uniform.UniformModel):
     def __init__(self, config, N, S, e, range_mod):
         uniform.UniformModel.__init__(self, config, N, S, range_mod)
         uid = max(self.nodes.keys()) + 1
+        
+        self.add_node(uid, S / 2.0, S / 2.0, range_mod)
+        self.source = uid
+        uid += 1
 
         x = 0
         y = -(range_mod + e)

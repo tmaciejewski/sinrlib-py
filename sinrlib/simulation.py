@@ -15,20 +15,27 @@ class Simulation:
     def __init__(self, model, noise_factory):
         self.model = model
         self.noise_factory = noise_factory
+
+    def run(self, algorithm, max_rounds = 1000000):
         self.success = 0
         self.failed = 0
         self.empty_rounds = 0
-
-    def run(self, algorithm, max_rounds = 1000000):
         round_number = 0
         warn_step = int(max_rounds / 10)
+
+        last_act = 0
 
         # setup noise
         for uid in self.model.nodes:
             self.model.nodes[uid].noise = self.noise_factory()
 
+        # get the source from model
+        source = self.model.source
+
         # init algorithm
-        senders = algorithm.init(self.model.nodes, self.model.links)
+        algorithm.init(self.model.nodes, self.model.links, source)
+
+        senders = [source]
 
         while not algorithm.is_done():
             new_senders = []
@@ -46,7 +53,7 @@ class Simulation:
 
             # eval model
             receivers = self.model.eval(senders)
-            #print 'senders:', len(senders), 'receiver:', len(receivers)
+            #print round_number, '| senders:', senders, 'receivers:', receivers
 
             for uid in self.model.nodes:
                 if uid in receivers:
