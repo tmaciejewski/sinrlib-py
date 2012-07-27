@@ -23,7 +23,7 @@ class BackoffAckAlgorithm():
 
     def on_round_end(self, uid, messages, round_number):
         state = self.state[uid]
-        if state.broadcasting:
+        if state.broadcasting and round_number % 2 == 0:
             if state.counter > 0:
                 state.counter -= 1
                 if state.waiting_for_ack:
@@ -33,14 +33,16 @@ class BackoffAckAlgorithm():
             else:
                 # switched off
                 return False
-        else:
+        elif not state.broadcasting and round_number % 2 == 1:
             return self.send_ack(uid, messages, round_number)
+        else:
+            return False
 
     def broadcast(self, uid, messages, round_number):
         state = self.state[uid]
         if state.counter == 0:
             # sending and waiting for ack
-            print uid, 'broadcast and waits for ack for', state.counter_max, 'rounds'
+            #print uid, 'broadcasts and waits for ack for', state.counter_max, 'rounds'
             state.waiting_for_ack = True
             state.counter = state.counter_max + 1
             return True
@@ -52,22 +54,22 @@ class BackoffAckAlgorithm():
         acks = [s for s in messages if s not in state.ack_from]
         if acks != []:
             # got ack so start all over again
-            print uid, 'got acks:', acks
+            #print uid, 'got acks:', acks
             state.ack_from.update(acks)
             state.counter = 1
             state.counter_max = 1
             state.waiting_for_ack = False
         elif state.counter == 0:
             # no ack
-            print uid, 'didn\'t get ack for last', state.counter_max, 'rounds'
+            #print uid, 'didn\'t get ack for last', state.counter_max, 'rounds'
             state.counter_max *= 2
             if state.counter_max > 2 * self.N:
                 # no more acks
-                print uid, 'switching off'
+                #print uid, 'switching off'
                 state.counter = -1
             else:
-                print uid, 'returns to broadcast'
-                state.broadcasting = True
+                #print uid, 'returns to broadcast'
+                state.waiting_for_ack = False
                 state.counter = random.randint(1, state.counter_max)
         return False
 
@@ -77,7 +79,7 @@ class BackoffAckAlgorithm():
         if senders != []:
             # wakes up
             sender = senders[0]
-            print uid, 'woken up by', sender
+            #print uid, 'woken up by', sender
             self.active.add(uid)
             state.counter_max = self.state[sender].counter_max
             state.counter = random.randint(1, state.counter_max)
@@ -85,7 +87,7 @@ class BackoffAckAlgorithm():
         if uid in self.active:
             state.counter -= 1
             if state.counter == 0:
-                print uid, 'sends ack'
+                #print uid, 'sends ack'
                 state.broadcasting = True
                 state.counter_max = 1
                 state.counter = 1
@@ -99,6 +101,6 @@ class BackoffAckAlgorithm():
         progress = len(self.active) / float(self.N)
         if progress > self.last_progress:
             self.last_progress = progress
-            print 'progress:', progress
+            #print 'progress:', progress
         return len(self.active) == self.N
 
