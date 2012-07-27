@@ -15,13 +15,13 @@ def main():
     S_start, S_end, S_step = [float(arg) for arg in sys.argv[3].split(',')]
 
     C = 1
-    e = 0.1
-    d = 20
+    e = 0.2
+    d = 10
 
     alg = [ #algorithms.DensityUnknownAlgorithm(config, e, C, d, d), \
             algorithms.DensityKnownAlgorithm(config, e, C, d), \
-            algorithms.BackoffAlgorithm(config), \
-            #algorithms.BackoffAckAlgorithm(config), \
+            #algorithms.BackoffAlgorithm(config), \
+            algorithms.BackoffAckAlgorithm(config), \
             ]
 
     for N in range(N_start, N_end + 1, N_step):
@@ -32,16 +32,17 @@ def main():
             for algorithm in alg:
                 results[algorithm] = []
             for _ in range(tries):
-                #model = sinrlib.UniformModel(config, N, S, 0.9)
-                #model = sinrlib.SocialModel(config, N, S, e, 0.1)
-                #model = sinrlib.GadgetModel(config, 5, 100, 0.9)
-                model = sinrlib.Gadget2Model(config, N, S, e, 0.9)
+                #model = sinrlib.UniformModel(config, N, S, 1 - e)
+                model = sinrlib.SocialModel(config, N, S, e, 0.1, 1 - e)
+                #model = sinrlib.GadgetModel(config, 15, 50, 1 - e)
+                #model = sinrlib.Gadget2Model(config, N, S, e, 1 - e)
                 #model.show()
+
                 diameter = model.diameter()
                 diams.append(diameter)
-                simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
                 for algorithm in alg:
                     try:
+                        simulation = sinrlib.Simulation(model, lambda: sinrlib.ConstNoise(1.0))
                         r = simulation.run(algorithm, 100000)
                         results[algorithm].append(r)
                         sys.stdout.write('.')
@@ -49,6 +50,8 @@ def main():
                     except sinrlib.AlgorithmFailed:
                         print >> sys.stderr, 'algorithm', algorithm, 'failed for N = %s, S = %s' % (N, S)
                         #model.show()
+                sys.stdout.write(',')
+                sys.stdout.flush()
             print 
 
 
