@@ -35,7 +35,7 @@ class Simulation:
         # init algorithm
         algorithm.init(self.model.nodes, self.model.links, source)
 
-        senders = [source]
+        senders = []
 
         while not algorithm.is_done():
             new_senders = []
@@ -45,15 +45,14 @@ class Simulation:
                 print 'round:', round_number
  
             if round_number > max_rounds:
-                raise AlgorithmFailed
-
+                raise AlgorithmFailed()
 
             if len(senders) == 0:
                 self.empty_rounds += 1
 
             # eval model
             receivers = self.model.eval(senders)
-            #print round_number, '| senders:', senders, 'receivers:', receivers
+            #print '|%d|' % round_number, 'senders:', senders, 'receivers:', receivers
 
             for uid in self.model.nodes:
                 if uid in receivers:
