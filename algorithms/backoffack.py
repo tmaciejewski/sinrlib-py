@@ -11,9 +11,10 @@ class State:
 
 class BackoffAckAlgorithm():
     def __init__(self, config):
-        self.last_progress = 0
+        self.config = config
 
     def init(self, nodes, links, source):
+        self.last_progress = 0
         self.nodes = nodes
         self.N = len(nodes)
         self.active = set([source])
