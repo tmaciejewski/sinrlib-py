@@ -27,6 +27,7 @@ class Model:
         self.config = config
         self.nodes = {}
         self.links = {}
+        self.reachable = {}
         self.power_cache  = {}
         self.failed_transmit = 0
         self.success_transmit = 0
@@ -43,7 +44,10 @@ class Model:
     def eval(self, senders):
         result = {}
         for sender in senders:
-            for receiver in self.nodes:
+            if not sender in self.reachable:
+                self.reachable[sender] = [uid for uid in self.nodes \
+                        if self.nodes[uid] - self.nodes[sender] <= 1]
+            for receiver in self.reachable[sender]:
                 success = False
                 # nodes can't send and receive simultanously
                 # and can't send to themselves
