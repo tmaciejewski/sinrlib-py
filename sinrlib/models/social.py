@@ -101,7 +101,12 @@ class SocialModel(model.Model):
             if len(self.nodes) >= n:
                 for comp in self.connected_components():
                     if len(comp) >= n:
-                        self.nodes = {uid : self.nodes[uid] for uid in comp}
-                        self.links = {uid : self.links[uid].intersection(comp) for uid in comp}
+                        nodes = {}
+                        links = {}
+                        for uid in comp:
+                            nodes[uid] = self.nodes[uid]
+                            links[uid] = self.links[uid].intersection(comp)
+                        self.nodes = nodes
+                        self.links = links
                         self.source = random.choice(self.nodes.keys())
                         return

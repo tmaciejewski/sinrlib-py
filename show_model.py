@@ -5,15 +5,15 @@ import sinrlib
 
 def main():
     N = 200
-    s = 10
-    e = .05
+    s = 5
+    e = .2
 
     config = sinrlib.Config()
 
     if sys.argv[1] == 'uniform':
-        model = sinrlib.UniformModel(config, N, s, 1-6*e)
+        model = sinrlib.UniformModel(config, N, s, 1-e)
     elif sys.argv[1] == 'social':
-        model = sinrlib.SocialModel(config, N, s, e, 1 - e*6, .1)
+        model = sinrlib.SocialModel(config, N, s, e, .1, 1 - e)
         
         #print 'Weights: '
         #for i in range(model.tiles):
@@ -52,7 +52,7 @@ def main():
     #    except:
     #        pass                
 
-    model.show('Network')            
+    model.show(title = 'Network')            
     #model.export_to_pdf('model.png', 'N = %d' % N)
 
 if __name__ == "__main__":
