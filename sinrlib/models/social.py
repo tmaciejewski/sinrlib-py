@@ -103,5 +103,5 @@ class SocialModel(model.Model):
                     if len(comp) >= n:
                         self.nodes = {uid : self.nodes[uid] for uid in comp}
                         self.links = {uid : self.links[uid].intersection(comp) for uid in comp}
-                        self.source = random.choose(self.nodes.keys())
+                        self.source = random.choice(self.nodes.keys())
                         return
