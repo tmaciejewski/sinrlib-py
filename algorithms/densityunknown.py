@@ -38,7 +38,7 @@ class DensityUnknownAlgorithm():
         for uid in self.nodes:
             self.state[uid] = State(nodes[uid].x, nodes[uid].y, self.gamma)
         self.state[source].leader = source
-        self.active = {source}
+        self.active = set([source])
 
     def on_round_end(self, uid, messages, round_number):
         state = self.state[uid]

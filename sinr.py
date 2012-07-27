@@ -2,7 +2,6 @@
 
 import math, sys
 import sinrlib, algorithms
-from matplotlib import pyplot
 
 def main():
     if len(sys.argv) < 3:
@@ -32,8 +31,8 @@ def main():
             for algorithm in alg:
                 results[algorithm] = []
             for _ in range(tries):
-                #model = sinrlib.UniformModel(config, N, S, 1 - e)
-                model = sinrlib.SocialModel(config, N, S, e, 0.1, 1 - e)
+                model = sinrlib.UniformModel(config, N, S, 1 - e)
+                #model = sinrlib.SocialModel(config, N, S, e, 0.1, 1 - e)
                 #model = sinrlib.GadgetModel(config, 15, 50, 1 - e)
                 #model = sinrlib.Gadget2Model(config, N, S, e, 1 - e)
                 #model.show()

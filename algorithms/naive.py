@@ -4,7 +4,7 @@ class NaiveAlgorithm():
     def init(self, nodes, links, source):
         self.nodes = nodes.keys()
         self.N = len(nodes)
-        self.active = {source}
+        self.active = set([source])
 
     def on_round_end(self, uid, messages, round_number):
         if messages != []:

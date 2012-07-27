@@ -32,7 +32,7 @@ class DensityKnownAlgorithm():
         self.N = len(nodes)
         self.gamma = self.e / (2 * math.sqrt(2))
         self.eval_ppb(nodes, self.e)
-        self.active = {source}
+        self.active = set([source])
 
     def on_round_end(self, uid, messages, round_number):
         if messages != []:

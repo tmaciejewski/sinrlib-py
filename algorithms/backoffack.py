@@ -15,7 +15,7 @@ class BackoffAckAlgorithm():
     def init(self, nodes, links, source):
         self.nodes = nodes
         self.N = len(nodes)
-        self.active = {source}
+        self.active = set([source])
         self.state = {}
         for uid in self.nodes:
             self.state[uid] = State()

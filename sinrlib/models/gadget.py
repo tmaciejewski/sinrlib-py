@@ -32,7 +32,7 @@ class GadgetModel(model.Model):
             source_x = self.nodes[source].x
             source_y = self.nodes[source].y + range_e
             self.nodes[uid] = model.Node(source_x, source_y)
-            self.links[uid] = {source}
+            self.links[uid] = set([source])
             self.links[source].add(uid)
             uid += 1
             

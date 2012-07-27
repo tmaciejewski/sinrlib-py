@@ -7,7 +7,7 @@ class BackoffAlgorithm():
     def init(self, nodes, links, source):
         self.nodes = nodes
         self.N = len(nodes)
-        self.active = {source}
+        self.active = set([source])
         self.phase = {}
         self.counter = {}
         for uid in self.nodes:
