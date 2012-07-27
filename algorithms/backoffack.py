@@ -6,6 +6,7 @@ class State:
         self.waiting_for_ack = False
         self.counter = 1
         self.counter_max = 1
+        self.density = None
         self.ack_from = set()
 
 class BackoffAckAlgorithm():
@@ -19,6 +20,9 @@ class BackoffAckAlgorithm():
         self.state = {}
         for uid in self.nodes:
             self.state[uid] = State()
+            neighbours = [u for u in self.nodes if u != uid \
+                    and self.nodes[u] - self.nodes[uid] <= 1]
+            self.state[uid].density = len(neighbours)
         self.state[source].broadcasting = True
 
     def on_round_end(self, uid, messages, round_number):
@@ -63,7 +67,7 @@ class BackoffAckAlgorithm():
             # no ack
             #print uid, 'didn\'t get ack for last', state.counter_max, 'rounds'
             state.counter_max *= 2
-            if state.counter_max > 2 * self.N:
+            if state.counter_max > 2 * state.density:
                 # no more acks
                 #print uid, 'switching off'
                 state.counter = -1

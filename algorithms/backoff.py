@@ -10,9 +10,13 @@ class BackoffAlgorithm():
         self.active = set([source])
         self.phase = {}
         self.counter = {}
+        self.density = {}
         for uid in self.nodes:
             self.phase[uid] = 1
             self.counter[uid] = 1
+            neighbours = [u for u in self.nodes if u != uid \
+                    and self.nodes[u] - self.nodes[uid] <= 1]
+            self.density[uid] = len(neighbours)
 
     def on_round_end(self, uid, messages, round_number):
         if messages != []:
@@ -23,7 +27,7 @@ class BackoffAlgorithm():
                 self.counter[uid] -= 1
             if self.counter[uid] == 0:
                 self.phase[uid] *= 2
-                if self.phase[uid] > self.N:
+                if self.phase[uid] > 2 * self.density[uid]:
                     self.counter[uid] = -1
                 else:
                     self.counter[uid] = random.randint(1, self.phase[uid])
